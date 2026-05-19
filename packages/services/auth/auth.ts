@@ -9,6 +9,10 @@ export const auth = betterAuth({
     provider: "pg",
     schema,
   }),
+  advanced: {
+    cookiePrefix: "anyform",
+    useSecureCookies: true,
+  },
   emailAndPassword: {
     enabled: true,
   },

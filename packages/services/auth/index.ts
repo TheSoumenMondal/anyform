@@ -32,6 +32,16 @@ class AuthService {
     return user;
   }
 
+  /**
+   * The function signInWithEmailAndPassword asynchronously signs in a user with their email and
+   * password.
+   * @param {SignInWithEmailAndPasswordInputType} payload - The `payload` parameter in the
+   * `signInWithEmailAndPassword` function likely contains the user's email and password information
+   * needed for signing in. It is of type `SignInWithEmailAndPasswordInputType`.
+   * @returns The function `signInWithEmailAndPassword` is returning the user object if the sign-in
+   * process is successful. If the sign-in process fails (i.e., if the user is not found or the
+   * password is incorrect), an error with the message "Invalid email or password" will be thrown.
+   */
   public async signInWithEmailAndPassword(payload: SignInWithEmailAndPasswordInputType) {
     const { email, password } = await signInWithEmailAndPasswordInput.parseAsync(payload);
     const user = await auth.api.signInEmail({
