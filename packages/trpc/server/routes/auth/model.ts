@@ -26,3 +26,11 @@ export const signInWithEmailAndPasswordOutputModel = z.object({
     image: z.string().nullable().optional(),
   }),
 });
+
+export const getUserInfoOutputModel = z.object({
+  id: z.string(),
+  name: z.string(),
+  email: z.string(),
+  emailVerified: z.boolean(),
+  image: z.string().nullable().optional(),
+});

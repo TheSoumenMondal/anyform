@@ -3,7 +3,7 @@ import { OpenApiMeta } from "trpc-to-openapi";
 
 import { createContext } from "./context";
 import { getAuthenticationTokenFromCookie } from "./utils/cookie";
-import { auth } from "@repo/services/auth/auth";
+import { authService } from "./services";
 
 export const tRPCContext = initTRPC.meta<OpenApiMeta>().context<typeof createContext>().create({});
 
@@ -20,13 +20,9 @@ export const protectedProcedure = tRPCContext.procedure.use(async ({ ctx, next }
     });
   }
 
-  const session = await auth.api.getSession({
-    headers: new Headers({
-      Authorization: `Bearer ${token}`,
-    }),
-  });
+  const session = await authService.getSessionFromToken(token);
 
-  if (!session) {
+  if (!session?.user) {
     throw new TRPCError({
       code: "UNAUTHORIZED",
       message: "Invalid or expired session. Please sign in again.",
@@ -37,7 +33,12 @@ export const protectedProcedure = tRPCContext.procedure.use(async ({ ctx, next }
     ctx: {
       ...ctx,
       user: session.user,
-      session: session.session,
+      session: {
+        id: session.id,
+        token: session.token,
+        userId: session.userId,
+        expiresAt: session.expiresAt,
+      },
     },
   });
 });

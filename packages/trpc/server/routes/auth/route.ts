@@ -1,11 +1,13 @@
-import { publicProcedure, router } from "../../trpc";
+import { protectedProcedure, publicProcedure, router } from "../../trpc";
 import { generatePath } from "../../utils/path-generator";
 import {
   createAccountWithEmailAndPasswordInputModel,
   createAccountWithEmailAndPasswordOutputModel,
+  getUserInfoOutputModel,
   signInWithEmailAndPasswordInputModel,
   signInWithEmailAndPasswordOutputModel,
 } from "./model";
+import { zodUndefinedModel } from "../../schema";
 import { authService } from "../../services";
 import { setAuthenticationTokenInCookie } from "../../utils/cookie";
 
@@ -54,6 +56,26 @@ export const authRouter = router({
       setAuthenticationTokenInCookie(ctx, userData.token);
       return {
         user: userData.user,
+      };
+    }),
+
+  getUserInfo: protectedProcedure
+    .meta({
+      openapi: {
+        method: "GET",
+        path: getPath("/getUserInfo"),
+        tags: TAGS,
+      },
+    })
+    .input(zodUndefinedModel)
+    .output(getUserInfoOutputModel)
+    .query(async ({ ctx }) => {
+      return {
+        id: ctx.user.id,
+        name: ctx.user.name,
+        email: ctx.user.email,
+        emailVerified: ctx.user.emailVerified,
+        image: ctx.user.image,
       };
     }),
 });
