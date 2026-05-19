@@ -1,7 +1,9 @@
 import { auth } from "./auth";
 import {
   type CreateAccountWithEmailAndPasswordInputType,
+  SignInWithEmailAndPasswordInputType,
   createAccountWithEmailAndPasswordInput,
+  signInWithEmailAndPasswordInput,
 } from "./model";
 
 class AuthService {
@@ -27,6 +29,20 @@ class AuthService {
         password,
       },
     });
+    return user;
+  }
+
+  public async signInWithEmailAndPassword(payload: SignInWithEmailAndPasswordInputType) {
+    const { email, password } = await signInWithEmailAndPasswordInput.parseAsync(payload);
+    const user = await auth.api.signInEmail({
+      body: {
+        email,
+        password,
+      },
+    });
+    if (!user) {
+      throw new Error("Invalid email or password");
+    }
     return user;
   }
 }

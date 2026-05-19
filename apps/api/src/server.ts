@@ -10,6 +10,7 @@ import { createContext } from "@repo/trpc/server/context.js";
 import { serverRouter } from "@repo/trpc/server/index.js";
 
 import { env } from "./env.js";
+import cookieParser from "cookie-parser";
 
 export const app = express();
 const openApiDocument = generateOpenApiDocument(serverRouter, {
@@ -21,12 +22,15 @@ const openApiDocument = generateOpenApiDocument(serverRouter, {
 if (env.NODE_ENV !== "prod") {
   app.use(
     cors({
-      origin: "*",
+      origin: env.CORS_ORIGIN,
+      credentials: true,
     }),
   );
 }
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 app.get("/", (req, res) => {
   return res.json({ message: "Streamyst is up and running..." });

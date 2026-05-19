@@ -9,3 +9,10 @@ export const createAccountWithEmailAndPasswordInput = z.object({
 export type CreateAccountWithEmailAndPasswordInputType = z.infer<
   typeof createAccountWithEmailAndPasswordInput
 >;
+
+export const signInWithEmailAndPasswordInput = z.object({
+  email: z.email().describe("Valid email is required"),
+  password: z.string().describe("Password is required"),
+});
+
+export type SignInWithEmailAndPasswordInputType = z.infer<typeof signInWithEmailAndPasswordInput>;
