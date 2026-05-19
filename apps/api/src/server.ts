@@ -6,9 +6,10 @@ import * as trpcExpress from "@trpc/server/adapters/express";
 import { generateOpenApiDocument, createOpenApiExpressMiddleware } from "trpc-to-openapi";
 import { apiReference } from "@scalar/express-api-reference";
 
-import { serverRouter, createContext } from "@repo/trpc/server";
+import { createContext } from "@repo/trpc/server/context.js";
+import { serverRouter } from "@repo/trpc/server/index.js";
 
-import { env } from "./env";
+import { env } from "./env.js";
 
 export const app = express();
 const openApiDocument = generateOpenApiDocument(serverRouter, {

@@ -6,6 +6,7 @@ import z from "zod";
 
 export const serverRouter = router({
   health: healthRouter,
+  auth: authRouter,
 });
 
 export { createContext } from "./context";
