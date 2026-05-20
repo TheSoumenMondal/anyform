@@ -16,7 +16,7 @@ export const form = pgTable(
     slug: text("slug").notNull(),
     description: text("description"),
     formType: formType("form_type").default("single_step").notNull(),
-    createdBy: uuid("created_by")
+    createdBy: text("created_by")
       .notNull()
       .references(() => user.id),
     formStatus: formStatus("form_status").default("draft").notNull(),
