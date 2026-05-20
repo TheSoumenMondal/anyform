@@ -13,6 +13,8 @@
     "@repo/logger": "workspace:*",
     "better-auth": "^1.6.11",
     "google-auth-library": "^10.5.0",
+    "nanoid": "^5.1.11",
+    "slugify": "^1.6.9",
     "zod": "^4.3.5"
   }
 }
