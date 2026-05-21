@@ -68,3 +68,10 @@ export const updateFormFieldInput = z.object({
 });
 
 export type UpdateFormFieldInputType = z.infer<typeof updateFormFieldInput>;
+
+export const deleteFormFieldInput = z.object({
+  userId: z.string().describe("ID of the user deleting the form field"),
+  fieldId: z.string().describe("ID of the form field to delete"),
+});
+
+export type DeleteFormFieldInputType = z.infer<typeof deleteFormFieldInput>;

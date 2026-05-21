@@ -1,7 +1,12 @@
 import db, { eq, max } from "@repo/database";
 import { form, formField } from "@repo/database/schema";
 import slugify from "slugify";
-import { CreateFormFieldInputType, UpdateFormFieldInputType } from "./model";
+import {
+  CreateFormFieldInputType,
+  deleteFormFieldInput,
+  DeleteFormFieldInputType,
+  UpdateFormFieldInputType,
+} from "./model";
 
 class FormFieldService {
   private createFormFieldLevelKey(label: string): string {
@@ -171,6 +176,36 @@ class FormFieldService {
       .returning();
 
     return updatedField;
+  }
+
+  public async deleteFormField(payload: DeleteFormFieldInputType) {
+    const { fieldId, userId } = await deleteFormFieldInput.parseAsync(payload);
+    const existingField = await db
+      .select()
+      .from(formField)
+      .where(eq(formField.id, fieldId))
+      .limit(1);
+
+    if (existingField.length === 0 || !existingField[0]) {
+      throw new Error("Form field not found");
+    }
+    const formId = existingField[0]?.formId;
+
+    const formData = await this.checkIfUserOwnsFormField(formId, userId);
+
+    if (formData.length === 0) {
+      throw new Error(
+        "Form not found or you do not have permission to delete fields from this form",
+      );
+    }
+
+    if (formData[0]?.formStatus === "published") {
+      throw new Error(
+        "Cannot delete fields from a published form. Please unpublish the form before making changes.",
+      );
+    }
+    await db.delete(formField).where(eq(formField.id, fieldId));
+    return { success: true };
   }
 }
 

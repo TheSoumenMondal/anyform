@@ -124,3 +124,11 @@ export const updateFormFieldInputModel = z.object({
 });
 
 export const updateFormFieldOutputModel = updateFormFieldInputModel;
+
+export const deleteFormFieldInputType = z.object({
+  formFieldId: z.string().describe("ID of the form field to be created"),
+});
+
+export const deleteFormFieldOutputType = z.object({
+  success: z.boolean().describe("Whether the form field was successfully deleted"),
+});

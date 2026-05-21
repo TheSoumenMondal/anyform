@@ -7,6 +7,8 @@ import {
   createFormFieldOutputModel,
   createFormInputModel,
   createFormOutputModel,
+  deleteFormFieldInputType,
+  deleteFormFieldOutputType,
   getFormByUserIdOutputModel,
   updateFormFieldInputModel,
   updateFormFieldOutputModel,
@@ -269,5 +271,30 @@ export const formRouter = router({
         dependsOnFieldId: result.dependsOnFieldId ?? undefined,
         stepNumber: result.stepNumber ?? undefined,
       };
+    }),
+
+  deleteFormField: protectedProcedure
+    .meta({
+      openapi: {
+        method: "DELETE",
+        path: "/deleteFormField",
+        tags: formTags,
+        protect: true,
+      },
+    })
+    .input(deleteFormFieldInputType)
+    .output(deleteFormFieldOutputType)
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.user.id;
+
+      const { formFieldId } = input;
+
+      const result = await formFieldService.deleteFormField({ userId, fieldId: formFieldId });
+
+      if (!result) {
+        throw new Error("Failed to delete form field");
+      }
+
+      return { success: true };
     }),
 });
