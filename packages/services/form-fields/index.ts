@@ -1,7 +1,7 @@
 import db, { eq, max } from "@repo/database";
 import { form, formField } from "@repo/database/schema";
 import slugify from "slugify";
-import { CreateFormFieldInputType } from "./model";
+import { CreateFormFieldInputType, UpdateFormFieldInputType } from "./model";
 
 class FormFieldService {
   private createFormFieldLevelKey(label: string): string {
@@ -63,10 +63,6 @@ class FormFieldService {
       throw new Error("Form not found or you do not have permission to add fields to this form");
     }
 
-    if (form[0]?.createdBy !== userId) {
-      throw new Error("Unauthorized: You do not own this form");
-    }
-
     if (form[0]?.formStatus === "published") {
       throw new Error(
         "Cannot add fields to a published form. Please unpublish the form before making changes.",
@@ -106,6 +102,75 @@ class FormFieldService {
       .returning();
 
     return newField;
+  }
+
+  public async updateFormField(payload: UpdateFormFieldInputType) {
+    const {
+      fieldId,
+      userId,
+      conditionalLogic,
+      defaultValue,
+      dependsOnFieldId,
+      description,
+      helpText,
+      isDisabled,
+      isHidden,
+      isRequired,
+      label,
+      options,
+      placeholder,
+      settings,
+      sortOrder,
+      stepNumber,
+      validation,
+    } = payload;
+
+    const existingField = await db
+      .select()
+      .from(formField)
+      .where(eq(formField.id, fieldId))
+      .limit(1);
+
+    if (existingField.length === 0 || !existingField[0]) {
+      throw new Error("Form field not found");
+    }
+
+    const updatedFormData = await this.checkIfUserOwnsFormField(existingField[0]?.formId, userId);
+
+    if (updatedFormData.length === 0) {
+      throw new Error("Form not found or you do not have permission to update fields in this form");
+    }
+
+    if (updatedFormData[0]?.formStatus === "published") {
+      throw new Error(
+        "Cannot update fields in a published form. Please unpublish the form before making changes.",
+      );
+    }
+
+    const [updatedField] = await db
+      .update(formField)
+      .set({
+        label,
+        description,
+        helpText,
+        isDisabled,
+        isHidden,
+        isRequired,
+        options,
+        placeholder,
+        settings,
+        sortOrder,
+        stepNumber,
+        validation,
+        conditionalLogic,
+        defaultValue,
+        dependsOnFieldId,
+        updatedAt: new Date(),
+      })
+      .where(eq(formField.id, fieldId))
+      .returning();
+
+    return updatedField;
   }
 }
 

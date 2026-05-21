@@ -98,3 +98,29 @@ export const createFormFieldInputModel = formFieldBaseModel.extend({
 export const createFormFieldOutputModel = formFieldBaseModel.extend({
   id: z.string().describe("ID of the created form field"),
 });
+
+export const updateFormFieldInputModel = z.object({
+  fieldId: z.string().describe("ID of the form field"),
+  label: z.string().min(1).max(150).describe("Label of the form field").optional(),
+  description: z.string().max(1000).describe("Description of the form field").optional(),
+  helpText: z.string().max(1000).describe("Help text for the form field").optional(),
+  placeholder: z.string().max(1000).describe("Placeholder text for the form field").optional(),
+  fieldType: formFieldTypeEnum.describe("Type of the form field").optional(),
+  isRequired: z.boolean().default(false).describe("Whether the form field is required").optional(),
+  isHidden: z.boolean().default(false).describe("Whether the form field is hidden").optional(),
+  isDisabled: z.boolean().default(false).describe("Whether the form field is disabled").optional(),
+  stepNumber: z.number().int().positive().describe("Step number for the form field").optional(),
+  sortOrder: z.number().int().describe("Sort order for the form field").optional(),
+  defaultValue: z.json().optional().describe("Default value for the form field").optional(),
+  options: z.json().optional().describe("Options for the form field").optional(),
+  validation: z.json().optional().describe("Validation rules for the form field").optional(),
+  settings: z.json().optional().describe("Settings for the form field").optional(),
+  dependsOnFieldId: z
+    .string()
+    .nullable()
+    .describe("ID of the field this field depends on")
+    .optional(),
+  conditionalLogic: z.json().describe("Conditional logic for the form field").optional(),
+});
+
+export const updateFormFieldOutputModel = updateFormFieldInputModel;

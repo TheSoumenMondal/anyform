@@ -8,6 +8,8 @@ import {
   createFormInputModel,
   createFormOutputModel,
   getFormByUserIdOutputModel,
+  updateFormFieldInputModel,
+  updateFormFieldOutputModel,
   updateFormInputModel,
   updateFormOutputType,
 } from "./model";
@@ -161,6 +163,89 @@ export const formRouter = router({
 
       return {
         id: result.id,
+        label: result.label,
+
+        description: result.description ?? undefined,
+        helpText: result.helpText ?? undefined,
+        placeholder: result.placeholder ?? undefined,
+
+        fieldType: result.fieldType,
+
+        isRequired: result.isRequired,
+        isHidden: result.isHidden,
+        isDisabled: result.isDisabled,
+
+        sortOrder: result.sortOrder,
+        defaultValue: toJsonOutput(result.defaultValue),
+
+        options: toJsonOutput(result.options),
+        validation: toJsonOutput(result.validation),
+        settings: toJsonOutput(result.settings),
+        conditionalLogic: toJsonOutput(result.conditionalLogic),
+
+        dependsOnFieldId: result.dependsOnFieldId ?? undefined,
+        stepNumber: result.stepNumber ?? undefined,
+      };
+    }),
+
+  updateFormField: protectedProcedure
+    .meta({
+      openapi: {
+        method: "PUT",
+        path: "/updateFormField",
+        tags: formTags,
+        protect: true,
+      },
+    })
+    .input(updateFormFieldInputModel)
+    .output(updateFormFieldOutputModel)
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.user.id;
+      const {
+        fieldId,
+        label,
+        description,
+        helpText,
+        placeholder,
+        isRequired,
+        isHidden,
+        isDisabled,
+        options,
+        settings,
+        sortOrder,
+        stepNumber,
+        validation,
+        defaultValue,
+        dependsOnFieldId,
+        conditionalLogic,
+      } = input;
+
+      const result = await formFieldService.updateFormField({
+        userId,
+        fieldId,
+        label,
+        description,
+        helpText,
+        placeholder,
+        isRequired,
+        isHidden,
+        isDisabled,
+        options,
+        settings,
+        sortOrder,
+        stepNumber,
+        validation,
+        defaultValue,
+        dependsOnFieldId: dependsOnFieldId ?? undefined,
+        conditionalLogic,
+      });
+
+      if (!result) {
+        throw new Error("Failed to update form field");
+      }
+
+      return {
+        fieldId: result.id,
         label: result.label,
 
         description: result.description ?? undefined,
