@@ -45,3 +45,24 @@ export const getFormByUserIdOutputModel = z.array(
     updatedAt: z.date().describe("Last update date of the form"),
   }),
 );
+
+export const updateFormInputModel = z.object({
+  formId: z.string().describe("ID of the form to be updated"),
+  title: z.string().min(3).max(255).describe("Title of the form").optional(),
+  description: z.string().max(1000).describe("Description of the form").optional(),
+  formType: z.enum(["single_step", "multi_step"]).describe("Type of the form").optional(),
+  isPublic: z.boolean().describe("Whether the form is public").optional(),
+  isProtected: z.boolean().describe("Whether the form is password protected").optional(),
+  password: z.string().max(255).describe("Password for protected form").optional(),
+  maxSubmissionLimit: z
+    .number()
+    .int()
+    .positive()
+    .describe("Maximum number of submissions allowed")
+    .optional(),
+  expiry: z.date().describe("Expiry date of the form").optional(),
+});
+
+export const updateFormOutputType = z.object({
+  id: z.string().describe("ID of the updated form"),
+});

@@ -1,9 +1,11 @@
-import db, { eq } from "@repo/database";
+import db, { and, eq, ne } from "@repo/database";
 import {
   createFormInput,
   CreateFormInputType,
   getFormByUserId,
   GetFormByUserIdType,
+  updateFormInput,
+  UpdateFormInputType,
 } from "./model";
 import { form } from "@repo/database/schema";
 import slugify from "slugify";
@@ -17,6 +19,28 @@ class FormService {
       replacement: "-",
     });
     return `${baseSlug}-${nanoid(6)}`;
+  }
+
+  private async checkFormOwnership(formId: string, userId: string) {
+    const formData = await db
+      .select({
+        createdBy: form.createdBy,
+      })
+      .from(form)
+      .where(eq(form.id, formId))
+      .limit(1);
+
+    const existingForm = formData[0];
+
+    if (!existingForm) {
+      throw new Error("Form not found");
+    }
+
+    if (existingForm.createdBy !== userId) {
+      throw new Error("Unauthorized: You do not own this form");
+    }
+
+    return existingForm;
   }
 
   public async createForm(payload: CreateFormInputType) {
@@ -82,8 +106,61 @@ class FormService {
         updatedAt: form.updatedAt,
       })
       .from(form)
-      .where(eq(form.createdBy, userId));
+      .where(and(eq(form.createdBy, userId), ne(form.formStatus, "deleted")));
     return result;
+  }
+
+  public async updateForm(payload: UpdateFormInputType) {
+    const {
+      formId,
+      description,
+      expiry,
+      formType,
+      isPublic,
+      isProtected,
+      password,
+      maxSubmissionLimit,
+      title,
+    } = await updateFormInput.parseAsync(payload);
+
+    const receivedUpdateData = {
+      description,
+      expiry,
+      formType,
+      isPublic,
+      isProtected,
+      password,
+      maxSubmissionLimit,
+      title,
+    };
+
+    await this.checkFormOwnership(formId, payload.userId);
+
+    const cleanedUpdateData = Object.fromEntries(
+      Object.entries(receivedUpdateData).filter(([, value]) => value !== undefined),
+    );
+
+    if (isProtected && !cleanedUpdateData.password) {
+      throw new Error("Password is required for protected forms");
+    }
+
+    if (!isProtected && cleanedUpdateData.password) {
+      throw new Error("Password should not be provided for unprotected forms");
+    }
+
+    const updatedData = await db
+      .update(form)
+      .set(cleanedUpdateData)
+      .where(eq(form.id, formId))
+      .returning({
+        id: form.id,
+      });
+
+    if (!updatedData || updatedData.length === 0 || !updatedData[0]?.id) {
+      throw new Error("Failed to update form");
+    }
+
+    return updatedData[0];
   }
 }
 

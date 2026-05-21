@@ -27,3 +27,23 @@ export const getFormByUserId = z.object({
 });
 
 export type GetFormByUserIdType = z.infer<typeof getFormByUserId>;
+
+export const updateFormInput = z.object({
+  userId: z.string().describe("ID of the user updating the form"),
+  formId: z.string().describe("ID of the form to be updated"),
+  title: z.string().min(3).max(255).describe("Title of the form").optional(),
+  description: z.string().max(1000).describe("Description of the form").optional(),
+  formType: z.enum(["single_step", "multi_step"]).describe("Type of the form").optional(),
+  isPublic: z.boolean().describe("Whether the form is public").optional(),
+  isProtected: z.boolean().describe("Whether the form is password protected").optional(),
+  password: z.string().max(255).describe("Password for protected form").optional(),
+  maxSubmissionLimit: z
+    .number()
+    .int()
+    .positive()
+    .describe("Maximum number of submissions allowed")
+    .optional(),
+  expiry: z.date().describe("Expiry date of the form").optional(),
+});
+
+export type UpdateFormInputType = z.infer<typeof updateFormInput>;
