@@ -12,9 +12,14 @@ const geistMono = localFont({
   variable: "--font-geist-mono",
 });
 
+const instrumentalSerif = localFont({
+  src: "./fonts/InstrumentSerifRegular.woff",
+  variable: "--font-instrumental-serif",
+});
+
 export const metadata: Metadata = {
-  title: "Streamyst",
-  description: "Media Forwarding",
+  title: "anyform",
+  description: "A form builder for developers",
 };
 
 export default function RootLayout({
@@ -24,7 +29,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} ${instrumentalSerif.variable}`}>
         <GlobalProviders>{children}</GlobalProviders>
       </body>
     </html>

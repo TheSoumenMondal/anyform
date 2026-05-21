@@ -1,60 +1,141 @@
-import * as React from "react";
-import { Slot } from "@radix-ui/react-slot";
-import { cva, type VariantProps } from "class-variance-authority";
+import { Button as ButtonPrimitive } from "@base-ui/react/button";
+import { cva } from "class-variance-authority";
 
 import { cn } from "~/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+  "focus-visible:border-ring focus-visible:ring-ring/30 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 border border-transparent text-xs/relaxed font-medium focus-visible:ring-[2px] aria-invalid:ring-[2px] [&_svg:not([class*='size-'])]:size-4 inline-flex items-center justify-center whitespace-nowrap disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none shrink-0 [&_svg]:shrink-0 outline-none group/button select-none gap-2! rounded-lg disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 cursor-pointer aria-expanded:ring-[2px] aria-expanded:ring-ring/30 appearance-none",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90",
-        destructive:
-          "bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
+        default:
+          "bg-radial-[at_52%_-52%] [text-shadow:0_1px_0_var(--color-primary)] border-primary bg-background from-primary/70 to-primary/95 hover:brightness-110 active:brightness-95 text-primary-foreground inset-shadow-2xs inset-shadow-white/25 border shadow-md shadow-zinc-950/30",
+        secondary:
+          "shadow-xs bg-linear-to-t hover:brightness-[0.97] to-sidebar from-muted bg-background dark:from-muted/50 dark:border-border border border-zinc-300 shadow-zinc-950/10 text-foreground",
+        decorations:
+          "shadow-xs hover:bg-muted bg-background dark:border-border border border-zinc-300 shadow-zinc-950/10 text-foreground",
+        muted:
+          "bg-muted hover:bg-neutral-200 dark:hover:bg-accent shadow-zinc-950/10 duration-200 text-foreground",
         outline:
-          "border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50",
-        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
-        link: "text-primary underline-offset-4 hover:underline",
+          "border-border dark:bg-input/20 dark:bg-input/30 hover:brightness-[0.97] hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground",
+        ghost:
+          "hover:bg-neutral-200 dark:hover:bg-accent hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground",
+        info: "text-white [text-shadow:0_1px_0_var(--color-blue-800)] from-blue-600/85 to-blue-600 inset-shadow-2xs inset-shadow-white/25 bg-linear-to-b border border-zinc-950/35 shadow-md shadow-zinc-950/20 border-0 hover:brightness-110 active:brightness-95",
+        success:
+          "text-white [text-shadow:0_1px_0_var(--color-emerald-800)] from-emerald-600/85 to-emerald-600 inset-shadow-2xs inset-shadow-white/25 bg-linear-to-b border border-zinc-950/35 shadow-md shadow-zinc-950/20 border-0 hover:brightness-110 active:brightness-95",
+        warning:
+          "text-white [text-shadow:0_1px_0_var(--color-amber-800)] from-amber-600/85 to-amber-600 inset-shadow-2xs inset-shadow-white/25 bg-linear-to-b border border-zinc-950/35 shadow-md shadow-zinc-950/20 border-0 hover:brightness-110 active:brightness-95",
+        destructive:
+          "text-white from-destructive to-destructive/85 bg-linear-to-t border border-b-2 border-zinc-950/40 shadow-md shadow-zinc-950/20 border-red-800 ring-1 ring-inset ring-white/25 hover:brightness-110 active:brightness-90",
+        raised:
+          "[text-shadow:0_1px_0_var(--color-zinc-100)] dark:[text-shadow:0_1px_0_var(--color-zinc-900)] bg-background hover:bg-zinc-50 dark:hover:bg-neutral-900 border-input/50 relative border-b-2 shadow-sm shadow-zinc-950/15 ring-0 ring-zinc-300 dark:ring-zinc-700 text-foreground",
+        link: "text-primary underline-offset-4 relative after:absolute after:bottom-0 after:left-0 after:h-[1px] after:w-0 after:bg-current hover:after:w-full after:transition-[width] after:duration-150 !px-0 !pb-0 [&_svg]:text-muted-foreground group [&_svg]:group-hover:text-foreground transition-colors",
       },
+
       size: {
-        default: "h-9 px-4 py-2 has-[>svg]:px-3",
-        sm: "h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5",
-        lg: "h-10 rounded-md px-6 has-[>svg]:px-4",
-        icon: "size-9",
-        "icon-sm": "size-8",
-        "icon-lg": "size-10",
+        default:
+          "h-7 gap-1 px-2 text-xs/relaxed has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3.5",
+        xs: "h-5 gap-1 rounded-sm px-2 text-[0.625rem] has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-2.5",
+        sm: "h-6 gap-1 px-2 text-xs/relaxed has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3",
+        lg: "h-8 gap-1 px-2.5 text-xs/relaxed has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 [&_svg:not([class*='size-'])]:size-4",
+        icon: "size-7 [&_svg:not([class*='size-'])]:size-3.5",
+        "icon-xs": "size-5 rounded-sm [&_svg:not([class*='size-'])]:size-2.5",
+        "icon-sm": "size-6 [&_svg:not([class*='size-'])]:size-3",
+        "icon-lg": "size-8 [&_svg:not([class*='size-'])]:size-4",
+      },
+      animation: {
+        all: "active:scale-[0.97] duration-150 [transition-property:color,background-color,border-color,text-decoration-color,fill,stroke,opacity,box-shadow,transform,filter,backdrop-filter,outline-color,--tw-gradient-from,--tw-gradient-to] [transition-timing-function:cubic-bezier(0.4,0,0.2,1)]",
+        colors:
+          "duration-150 [transition-property:color,background-color,border-color,text-decoration-color,fill,stroke,--tw-gradient-from,--tw-gradient-to] [transition-timing-function:cubic-bezier(0.4,0,0.2,1)]",
+        none: "",
+        "only-scale":
+          "active:scale-[0.97] duration-150 [transition-property:transform] [transition-timing-function:cubic-bezier(0.4,0,0.2,1)]",
       },
     },
     defaultVariants: {
       variant: "default",
       size: "default",
+      animation: "all",
     },
   },
 );
 
 function Button({
-  className,
+  className = "",
   variant = "default",
   size = "default",
-  asChild = false,
+  animation = "all",
+  children,
   ...props
-}: React.ComponentProps<"button"> &
-  VariantProps<typeof buttonVariants> & {
-    asChild?: boolean;
-  }) {
-  const Comp = asChild ? Slot : "button";
-
+}: {
+  className?: string;
+  variant?:
+    | "default"
+    | "secondary"
+    | "decorations"
+    | "muted"
+    | "outline"
+    | "ghost"
+    | "info"
+    | "success"
+    | "warning"
+    | "destructive"
+    | "raised"
+    | "link";
+  size?: "default" | "xs" | "sm" | "lg" | "icon" | "icon-xs" | "icon-sm" | "icon-lg";
+  animation?: "all" | "colors" | "none" | "only-scale";
+  children?: React.ReactNode;
+  [key: string]: unknown;
+}) {
   return (
-    <Comp
+    <ButtonPrimitive
       data-slot="button"
-      data-variant={variant}
-      data-size={size}
-      className={cn(buttonVariants({ variant, size, className }))}
+      className={cn(
+        buttonVariants({ variant, size, animation, className }),
+        variant === "decorations" && "relative rounded-none overflow-visible",
+      )}
       {...props}
-    />
+    >
+      {children}
+      {variant === "decorations" && (
+        <div className={cn("absolute -left-px -top-px z-10")}>
+          <div className="relative">
+            <div className="bg-muted-foreground w-px h-1.25 rounded-full absolute top-0" />
+            <div className="bg-muted-foreground w-1.25 h-px rounded-full absolute left-0" />
+          </div>
+        </div>
+      )}
+
+      {variant === "decorations" && (
+        <div className={cn("absolute right-0 -top-px z-10")}>
+          <div className="relative">
+            <div className="bg-muted-foreground w-px h-1.25 rounded-full absolute top-0" />
+            <div className="bg-muted-foreground w-1.25 h-px rounded-full absolute left-[-4.5px]" />
+          </div>
+        </div>
+      )}
+
+      {variant === "decorations" && (
+        <div className={cn("absolute -left-px bottom-0 z-10")}>
+          <div className="relative">
+            <div className="bg-muted-foreground w-px h-1.25 rounded-full absolute top-[-4.5px]" />
+            <div className="bg-muted-foreground w-1.25 h-px rounded-full absolute left-0" />
+          </div>
+        </div>
+      )}
+
+      {variant === "decorations" && (
+        <div className={cn("absolute right-0 bottom-0 z-10")}>
+          <div className="relative">
+            <div className="bg-muted-foreground w-px h-1.25 rounded-full absolute top-[-4.5px]" />
+            <div className="bg-muted-foreground w-1.25 h-px rounded-full absolute left-[-4.5px]" />
+          </div>
+        </div>
+      )}
+    </ButtonPrimitive>
   );
 }
+
+Button.displayName = "Button";
 
 export { Button, buttonVariants };
