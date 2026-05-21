@@ -1,5 +1,10 @@
-import db from "@repo/database";
-import { createFormInput, CreateFormInputType } from "./model";
+import db, { eq } from "@repo/database";
+import {
+  createFormInput,
+  CreateFormInputType,
+  getFormByUserId,
+  GetFormByUserIdType,
+} from "./model";
 import { form } from "@repo/database/schema";
 import slugify from "slugify";
 import { nanoid } from "nanoid";
@@ -58,6 +63,27 @@ class FormService {
     }
 
     return result[0];
+  }
+
+  public async getFormsByUserId(payload: GetFormByUserIdType) {
+    const { userId } = await getFormByUserId.parseAsync(payload);
+    const result = await db
+      .select({
+        id: form.id,
+        title: form.title,
+        description: form.description,
+        formType: form.formType,
+        formStatus: form.formStatus,
+        isPublic: form.isPublic,
+        isProtected: form.isProtected,
+        maxSubmissionLimit: form.maxSubmissionLimit,
+        expiry: form.expiry,
+        createdAt: form.createdAt,
+        updatedAt: form.updatedAt,
+      })
+      .from(form)
+      .where(eq(form.createdBy, userId));
+    return result;
   }
 }
 

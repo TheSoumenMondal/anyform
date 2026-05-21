@@ -1,6 +1,9 @@
+import { zodUndefinedModel } from "../../schema";
 import { formService } from "../../services";
 import { protectedProcedure, router } from "../../trpc";
-import { createFormInputModel, createFormOutputModel } from "./model";
+import { createFormInputModel, createFormOutputModel, getFormByUserIdOutputModel } from "./model";
+
+const formTags = ["Form"];
 
 export const formRouter = router({
   createForm: protectedProcedure
@@ -8,7 +11,8 @@ export const formRouter = router({
       openapi: {
         method: "POST",
         path: "/createForm",
-        tags: ["Form"],
+        tags: formTags,
+        protect: true,
       },
     })
     .input(createFormInputModel)
@@ -39,5 +43,23 @@ export const formRouter = router({
       return {
         id: result.id,
       };
+    }),
+
+  getFormsByUserId: protectedProcedure
+    .meta({
+      openapi: {
+        method: "GET",
+        path: "/getFormsByUserId",
+        tags: formTags,
+      },
+    })
+    .input(zodUndefinedModel)
+    .output(getFormByUserIdOutputModel)
+    .query(async ({ ctx }) => {
+      const { user } = ctx;
+      const result = await formService.getFormsByUserId({
+        userId: user.id,
+      });
+      return result;
     }),
 });

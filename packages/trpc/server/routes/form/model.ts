@@ -22,3 +22,26 @@ export const createFormInputModel = z.object({
 export const createFormOutputModel = z.object({
   id: z.string().describe("ID of the created form"),
 });
+
+export const getFormByUserIdOutputModel = z.array(
+  z.object({
+    id: z.string().describe("ID of the form"),
+    title: z.string().describe("Title of the form"),
+    description: z.string().nullable().describe("Description of the form"),
+    formType: z.enum(["single_step", "multi_step"]).describe("Type of the form"),
+    formStatus: z
+      .enum(["draft", "published", "archived", "deleted"])
+      .describe("Status of the form"),
+    isPublic: z.boolean().describe("Whether the form is public"),
+    isProtected: z.boolean().describe("Whether the form is password protected"),
+    maxSubmissionLimit: z
+      .number()
+      .int()
+      .positive()
+      .describe("Maximum number of submissions allowed")
+      .nullable(),
+    expiry: z.date().describe("Expiry date of the form"),
+    createdAt: z.date().describe("Creation date of the form"),
+    updatedAt: z.date().describe("Last update date of the form"),
+  }),
+);

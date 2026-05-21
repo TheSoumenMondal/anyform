@@ -21,3 +21,9 @@ export const createFormInput = z.object({
 });
 
 export type CreateFormInputType = z.infer<typeof createFormInput>;
+
+export const getFormByUserId = z.object({
+  userId: z.string().describe("ID of the user whose forms are to be retrieved"),
+});
+
+export type GetFormByUserIdType = z.infer<typeof getFormByUserId>;
