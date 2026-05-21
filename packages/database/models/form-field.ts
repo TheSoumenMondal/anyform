@@ -7,6 +7,7 @@ import { uniqueIndex } from "drizzle-orm/pg-core";
 import { AnyPgColumn } from "drizzle-orm/pg-core";
 import { index } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
+import { numeric } from "drizzle-orm/pg-core";
 
 export const formFieldVariant = pgEnum("form_field_variant", [
   "short_text",
@@ -50,6 +51,8 @@ export const formField = pgTable(
 
     stepNumber: integer("step_number"),
     sortOrder: integer("sort_order").notNull().default(0),
+
+    index: numeric("index", { scale: 2 }).notNull(),
 
     defaultValue: jsonb("default_value"),
     options: jsonb("options"),
