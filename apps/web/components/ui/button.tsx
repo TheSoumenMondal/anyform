@@ -67,7 +67,7 @@ function Button({
   animation = "all",
   children,
   ...props
-}: {
+}: React.ComponentProps<"button"> & {
   className?: string;
   variant?:
     | "default"
@@ -85,7 +85,6 @@ function Button({
   size?: "default" | "xs" | "sm" | "lg" | "icon" | "icon-xs" | "icon-sm" | "icon-lg";
   animation?: "all" | "colors" | "none" | "only-scale";
   children?: React.ReactNode;
-  [key: string]: unknown;
 }) {
   return (
     <ButtonPrimitive

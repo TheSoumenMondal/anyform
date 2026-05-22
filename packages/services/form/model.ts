@@ -1,5 +1,9 @@
 import { z } from "zod";
 
+const dateTimeInput = z.union([z.date(), z.iso.datetime()]).transform((value) => {
+  return typeof value === "string" ? new Date(value) : value;
+});
+
 export const createFormInput = z.object({
   createdBy: z.string().describe("ID of the user creating the form"),
   title: z.string().min(3).max(255).describe("Title of the form"),
@@ -17,7 +21,7 @@ export const createFormInput = z.object({
     .positive()
     .default(100)
     .describe("Maximum number of submissions allowed"),
-  expiry: z.date().describe("Expiry date of the form"),
+  expiry: dateTimeInput.describe("Expiry date of the form"),
 });
 
 export type CreateFormInputType = z.infer<typeof createFormInput>;
@@ -43,7 +47,7 @@ export const updateFormInput = z.object({
     .positive()
     .describe("Maximum number of submissions allowed")
     .optional(),
-  expiry: z.date().describe("Expiry date of the form").optional(),
+  expiry: dateTimeInput.describe("Expiry date of the form").optional(),
 });
 
 export type UpdateFormInputType = z.infer<typeof updateFormInput>;

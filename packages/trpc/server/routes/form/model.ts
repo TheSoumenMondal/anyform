@@ -1,6 +1,10 @@
 import z from "zod";
 import { formFieldTypeEnum } from "@repo/services/form-fields/model";
 
+const dateTimeInputModel = z.union([z.date(), z.iso.datetime()]).transform((value) => {
+  return typeof value === "string" ? new Date(value) : value;
+});
+
 export const createFormInputModel = z.object({
   title: z.string().min(3).max(255).describe("Title of the form"),
   description: z.string().max(1000).describe("Description of the form").optional(),
@@ -17,7 +21,7 @@ export const createFormInputModel = z.object({
     .positive()
     .default(100)
     .describe("Maximum number of submissions allowed"),
-  expiry: z.date().describe("Expiry date of the form"),
+  expiry: dateTimeInputModel.describe("Expiry date of the form"),
 });
 
 export const createFormOutputModel = z.object({
@@ -61,7 +65,7 @@ export const updateFormInputModel = z.object({
     .positive()
     .describe("Maximum number of submissions allowed")
     .optional(),
-  expiry: z.date().describe("Expiry date of the form").optional(),
+  expiry: dateTimeInputModel.describe("Expiry date of the form").optional(),
 });
 
 export const updateFormOutputType = z.object({
