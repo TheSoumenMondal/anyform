@@ -1,7 +1,5 @@
-import * as React from "react";
+import { FormsLanding } from "~/components/features/form/FormsLanding";
 
-const page = () => {
-  return <div>page</div>;
-};
-
-export default page;
+export default function FormPage() {
+  return <FormsLanding />;
+}

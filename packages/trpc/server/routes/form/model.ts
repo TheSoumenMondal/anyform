@@ -31,6 +31,7 @@ export const createFormOutputModel = z.object({
 export const getFormByUserIdOutputModel = z.array(
   z.object({
     id: z.string().describe("ID of the form"),
+    slug: z.string().describe("Slug of the form"),
     title: z.string().describe("Title of the form"),
     description: z.string().nullable().describe("Description of the form"),
     formType: z.enum(["single_step", "multi_step"]).describe("Type of the form"),

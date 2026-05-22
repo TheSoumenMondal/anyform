@@ -14,7 +14,7 @@ import {
   LockKeyIcon,
   UserGroupIcon,
 } from "@hugeicons/core-free-icons";
-import { trpc } from "~/trpc/client";
+import { useCreateForm } from "~/hooks/api/form/use-create-form";
 import { cn } from "~/lib/utils";
 
 import { Button } from "~/components/ui/button";
@@ -117,7 +117,7 @@ type FormOutput = z.infer<typeof formSchema>;
 
 export const CreateFormDialog = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const utils = trpc.useUtils();
+  const { createForm, createFormIsPending } = useCreateForm();
 
   const form = useForm<FormInput, undefined, FormOutput>({
     resolver: zodResolver(formSchema),
@@ -134,49 +134,49 @@ export const CreateFormDialog = () => {
 
   const isProtected = form.watch("isProtected");
 
-  const createFormMutation = trpc.form.createForm.useMutation({
-    onSuccess: () => {
-      toast.success("Success", {
-        description: "Your form has been created.",
-        action: (
-          <Button
-            className="ml-auto"
-            size="sm"
-            type="button"
-            variant="raised"
-            onClick={() => toast.dismiss()}
-          >
-            Close
-          </Button>
-        ),
-        style: {
-          border: "1px solid var(--border)",
-          borderStyle: "dashed",
-        },
-      });
-      utils.form.getFormsByUserId.invalidate();
-      setIsDialogOpen(false);
-      form.reset();
-    },
-    onError: (error) => {
-      toast.error("Failed to create form", {
-        description: error.message,
-      });
-    },
-  });
-
   const onSubmit = (values: FormOutput) => {
     if (!values.expiry) return;
-    createFormMutation.mutate({
-      title: values.title,
-      description: values.description,
-      formType: values.formType,
-      isPublic: values.isPublic,
-      isProtected: values.isProtected,
-      password: values.isProtected ? values.password : undefined,
-      maxSubmissionLimit: values.maxSubmissionLimit,
-      expiry: values.expiry.toISOString(),
-    });
+    createForm(
+      {
+        title: values.title,
+        description: values.description,
+        formType: values.formType,
+        isPublic: values.isPublic,
+        isProtected: values.isProtected,
+        password: values.isProtected ? values.password : undefined,
+        maxSubmissionLimit: values.maxSubmissionLimit,
+        expiry: values.expiry.toISOString(),
+      },
+      {
+        onSuccess: () => {
+          toast.success("Success", {
+            description: "Your form has been created.",
+            action: (
+              <Button
+                className="ml-auto"
+                size="sm"
+                type="button"
+                variant="raised"
+                onClick={() => toast.dismiss()}
+              >
+                Close
+              </Button>
+            ),
+            style: {
+              border: "1px solid var(--border)",
+              borderStyle: "dashed",
+            },
+          });
+          setIsDialogOpen(false);
+          form.reset();
+        },
+        onError: (error) => {
+          toast.error("Failed to create form", {
+            description: error.message,
+          });
+        },
+      },
+    );
   };
 
   return (
@@ -461,13 +461,8 @@ export const CreateFormDialog = () => {
                   </Button>
                 }
               />
-              <Button
-                variant="default"
-                size="default"
-                type="submit"
-                disabled={createFormMutation.isPending}
-              >
-                {createFormMutation.isPending ? "Creating..." : "Create Form"}
+              <Button variant="default" size="default" type="submit" disabled={createFormIsPending}>
+                {createFormIsPending ? "Creating..." : "Create Form"}
               </Button>
             </DialogFooter>
           </form>

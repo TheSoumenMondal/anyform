@@ -261,9 +261,15 @@ importers:
       react-resizable-panels:
         specifier: ^4.2.1
         version: 4.11.1(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      react-tooltip:
+        specifier: ^6.0.4
+        version: 6.0.4(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       recharts:
         specifier: 2.15.4
         version: 2.15.4(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      snap-qr:
+        specifier: ^1.0.1
+        version: 1.0.1(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       sonner:
         specifier: ^2.0.7
         version: 2.0.7(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
@@ -6973,6 +6979,19 @@ packages:
       }
     engines: { node: ">=6" }
 
+  qr-code-styling@1.9.2:
+    resolution:
+      {
+        integrity: sha512-RgJaZJ1/RrXJ6N0j7a+pdw3zMBmzZU4VN2dtAZf8ZggCfRB5stEQ3IoDNGaNhYY3nnZKYlYSLl5YkfWN5dPutg==,
+      }
+    engines: { node: ">=18.18.0" }
+
+  qrcode-generator@1.5.2:
+    resolution:
+      {
+        integrity: sha512-pItrW0Z9HnDBnFmgiNrY1uxRdri32Uh9EjNYLPVC2zZ3ZRIIEqBoDgm4DkvDwNNDHTK7FNkmr8zAa77BYc9xNw==,
+      }
+
   qs@6.15.2:
     resolution:
       {
@@ -7127,6 +7146,15 @@ packages:
     peerDependenciesMeta:
       "@types/react":
         optional: true
+
+  react-tooltip@6.0.4:
+    resolution:
+      {
+        integrity: sha512-UqRnj2wzkPQL12K+Zx12lY0oVrgCftGBfXjsN13H0qMt6rGQfZc/vyu2Hgrbujv3ZorvCc6GJMcNPYg+hhM/Dg==,
+      }
+    peerDependencies:
+      react: ">=16.14.0"
+      react-dom: ">=16.14.0"
 
   react-transition-group@4.4.5:
     resolution:
@@ -7465,6 +7493,15 @@ packages:
         integrity: sha512-vZ7rfeehZui7wQs438JXBckYLkIIdfHOXsaVEUMyS5fHo1483l1bMdo0EDSWYclY0yZKFOipDy4KHuKs6ssvdg==,
       }
     engines: { node: ">=8.0.0" }
+
+  snap-qr@1.0.1:
+    resolution:
+      {
+        integrity: sha512-q56+tqkzL1BOH9jFVhXvR3qjaVbRHoFmaIIVLXXOW0tWthW1RigE/Wfdr+9fVexJ2NUqJYC6m/nQzhi7nlIxaA==,
+      }
+    peerDependencies:
+      react: ^18 || ^19
+      react-dom: ^18 || ^19
 
   sonner@2.0.7:
     resolution:
@@ -11947,6 +11984,12 @@ snapshots:
 
   punycode@2.3.1: {}
 
+  qr-code-styling@1.9.2:
+    dependencies:
+      qrcode-generator: 1.5.2
+
+  qrcode-generator@1.5.2: {}
+
   qs@6.15.2:
     dependencies:
       side-channel: 1.1.0
@@ -12094,6 +12137,13 @@ snapshots:
       tslib: 2.8.1
     optionalDependencies:
       "@types/react": 19.2.2
+
+  react-tooltip@6.0.4(react-dom@19.2.6(react@19.2.6))(react@19.2.6):
+    dependencies:
+      "@floating-ui/dom": 1.7.6
+      clsx: 2.1.1
+      react: 19.2.6
+      react-dom: 19.2.6(react@19.2.6)
 
   react-transition-group@4.4.5(react-dom@19.2.6(react@19.2.6))(react@19.2.6):
     dependencies:
@@ -12391,6 +12441,12 @@ snapshots:
       is-fullwidth-code-point: 5.1.0
 
   slugify@1.6.9: {}
+
+  snap-qr@1.0.1(react-dom@19.2.6(react@19.2.6))(react@19.2.6):
+    dependencies:
+      qr-code-styling: 1.9.2
+      react: 19.2.6
+      react-dom: 19.2.6(react@19.2.6)
 
   sonner@2.0.7(react-dom@19.2.6(react@19.2.6))(react@19.2.6):
     dependencies:

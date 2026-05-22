@@ -94,6 +94,7 @@ class FormService {
     const result = await db
       .select({
         id: form.id,
+        slug: form.slug,
         title: form.title,
         description: form.description,
         formType: form.formType,
