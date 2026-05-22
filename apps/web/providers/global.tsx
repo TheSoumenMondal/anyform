@@ -2,7 +2,9 @@
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
-import React, { useState } from "react";
+import React, { Suspense, useState } from "react";
+import { AuthGuard } from "~/components/auth/AuthGuard";
+import { AuthGuardFallback } from "~/components/auth/AuthGuardFallback";
 import { Toaster } from "~/components/ui/sonner";
 
 import { trpc } from "~/trpc/client";
@@ -32,8 +34,10 @@ export const GlobalProviders: React.FC<{ children: React.ReactNode }> = ({ child
         disableTransitionOnChange
       >
         <trpc.Provider queryClient={queryClient} client={trpcClient}>
-          {children}
-          <Toaster />
+          <Suspense fallback={<AuthGuardFallback />}>
+            <AuthGuard>{children}</AuthGuard>
+          </Suspense>
+          <Toaster richColors position="bottom-right" />
         </trpc.Provider>
       </NextThemesProvider>
     </QueryClientProvider>
