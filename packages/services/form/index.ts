@@ -2,6 +2,8 @@ import db, { and, eq, ne } from "@repo/database";
 import {
   createFormInput,
   CreateFormInputType,
+  deleteFormInput,
+  DeleteFormInputType,
   getFormByUserId,
   GetFormByUserIdType,
   updateFormInput,
@@ -162,6 +164,19 @@ class FormService {
     }
 
     return updatedData[0];
+  }
+
+  public async deleteForm(payload: DeleteFormInputType) {
+    const { formId, userId } = await deleteFormInput.parseAsync(payload);
+    await this.checkFormOwnership(formId, userId);
+    await db
+      .update(form)
+      .set({
+        formStatus: "deleted",
+      })
+      .where(eq(form.id, formId));
+
+    return { success: true };
   }
 }
 

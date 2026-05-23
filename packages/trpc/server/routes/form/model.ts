@@ -73,6 +73,14 @@ export const updateFormOutputType = z.object({
   id: z.string().describe("ID of the updated form"),
 });
 
+export const deleteFormInputModel = z.object({
+  formId: z.string().describe("ID of the form to be deleted"),
+});
+
+export const deleteFormOutputModel = z.object({
+  success: z.boolean().describe("Whether the form was successfully deleted"),
+});
+
 const formFieldBaseModel = z.object({
   label: z.string().min(1).max(150).describe("Label of the form field"),
   description: z.string().max(1000).describe("Description of the form field").optional(),

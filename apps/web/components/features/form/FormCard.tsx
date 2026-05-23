@@ -3,14 +3,20 @@
 import Link from "next/link";
 import { format } from "date-fns";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Calendar01Icon, LockKeyIcon, Trash2, UserGroupIcon } from "@hugeicons/core-free-icons";
+import {
+  Calendar01Icon,
+  EditTableIcon,
+  LockKeyIcon,
+  UserLove01Icon,
+} from "@hugeicons/core-free-icons";
 import { type RouterOutputs } from "@repo/trpc/client";
 
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "~/components/ui/card";
 import { BadgeAdditional } from "~/components/ui/badge-1";
-import { Button } from "~/components/ui/button";
 import QrDialog from "./QrDialog";
 import { EditFormSheet } from "./EditFormSheet";
+import { DeleteFormDialog } from "./DeleteFormDialog";
+import { Button } from "~/components/ui/button";
 
 type UserForm = RouterOutputs["form"]["getFormsByUserId"][number];
 
@@ -30,8 +36,10 @@ export const FormCard = ({ form }: FormCardProps) => {
         <CardHeader className="gap-3 p-5">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0 space-y-2">
-              <CardTitle className="line-clamp-2 text-base leading-snug">{form.title}</CardTitle>
-              <p className="line-clamp-2 min-h-10 text-sm text-muted-foreground">
+              <CardTitle className="line-clamp-2 font-semibold leading-snug">
+                {form.title}
+              </CardTitle>
+              <p className="line-clamp-2 min-h-10 text-sm font-sans text-muted-foreground">
                 {form.description || "No description provided."}
               </p>
             </div>
@@ -56,7 +64,7 @@ export const FormCard = ({ form }: FormCardProps) => {
 
           <div className="grid gap-2 text-sm text-muted-foreground">
             <div className="flex items-center gap-2">
-              <HugeiconsIcon icon={UserGroupIcon} className="size-4 shrink-0" />
+              <HugeiconsIcon icon={UserLove01Icon} className="size-4 shrink-0" />
               <span>{form.maxSubmissionLimit ?? "Unlimited"} submissions</span>
             </div>
             <div className="flex items-center gap-2">
@@ -66,20 +74,14 @@ export const FormCard = ({ form }: FormCardProps) => {
           </div>
         </CardContent>
       </Link>
-      <CardFooter
-        background
-        className="mb-0! mt-auto h-auto! flex-wrap justify-end gap-2 border-t bg-muted/25 px-5! py-3!"
-      >
-        <Button
-          animation="none"
-          type="button"
-          size="lg"
-          variant="destructive"
-          aria-label={`Delete ${form.title}`}
-        >
-          <HugeiconsIcon icon={Trash2} className="size-3.5" />
-          Delete
-        </Button>
+      <CardFooter background className="mb-0! gap-2">
+        <Link href={`/form/${form.slug}`} className="ml-auto">
+          <Button size="lg" variant="info">
+            {" "}
+            <HugeiconsIcon icon={EditTableIcon} /> Add Fields
+          </Button>
+        </Link>
+        <DeleteFormDialog formId={form.id} formTitle={form.title} />
         <EditFormSheet form={form} />
         <QrDialog formId={form.id} formTitle={form.title} />
       </CardFooter>
