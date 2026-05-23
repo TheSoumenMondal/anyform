@@ -36,7 +36,7 @@ export const FormsLanding = () => {
     <main className="flex min-h-full flex-col gap-6 p-4 md:p-6">
       {formsIsLoading ? (
         <div className={gridClassName}>
-          {Array.from({ length: 6 }).map((_, index) => (
+          {Array.from({ length: 12 }).map((_, index) => (
             <Skeleton key={index} className="h-52 rounded-lg" />
           ))}
         </div>

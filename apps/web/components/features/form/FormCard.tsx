@@ -3,19 +3,14 @@
 import Link from "next/link";
 import { format } from "date-fns";
 import { HugeiconsIcon } from "@hugeicons/react";
-import {
-  Calendar01Icon,
-  LockKeyIcon,
-  Trash2,
-  UserGroupIcon,
-  PencilIcon,
-} from "@hugeicons/core-free-icons";
+import { Calendar01Icon, LockKeyIcon, Trash2, UserGroupIcon } from "@hugeicons/core-free-icons";
 import { type RouterOutputs } from "@repo/trpc/client";
 
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "~/components/ui/card";
 import { BadgeAdditional } from "~/components/ui/badge-1";
 import { Button } from "~/components/ui/button";
 import QrDialog from "./QrDialog";
+import { EditFormSheet } from "./EditFormSheet";
 
 type UserForm = RouterOutputs["form"]["getFormsByUserId"][number];
 
@@ -85,16 +80,7 @@ export const FormCard = ({ form }: FormCardProps) => {
           <HugeiconsIcon icon={Trash2} className="size-3.5" />
           Delete
         </Button>
-        <Button
-          animation="none"
-          size="lg"
-          type="button"
-          variant="info"
-          aria-label={`Edit ${form.title}`}
-        >
-          <HugeiconsIcon icon={PencilIcon} className="size-3.5" />
-          Edit
-        </Button>
+        <EditFormSheet form={form} />
         <QrDialog formId={form.id} formTitle={form.title} />
       </CardFooter>
     </Card>
