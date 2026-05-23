@@ -1,4 +1,7 @@
+"use client";
+
 import * as React from "react";
+import { usePathname } from "next/navigation";
 import { AppSidebar } from "~/components/features/sidebar/AppSidebar";
 import Navbar from "~/components/features/sidebar/Navbar";
 import { SidebarProvider } from "~/components/ui/sidebar";
@@ -7,9 +10,13 @@ type Props = {
   children: React.ReactNode;
 };
 
-const layout = ({ children }: Props) => {
+const Layout = ({ children }: Props) => {
+  const pathname = usePathname();
+  const isFormDetailRoute =
+    pathname.startsWith("/form/") && pathname.split("/").filter(Boolean).length >= 2;
+
   return (
-    <SidebarProvider>
+    <SidebarProvider defaultOpen={!isFormDetailRoute}>
       <AppSidebar />
       <main className="flex w-full flex-col max-h-screen pl-0">
         <Navbar />
@@ -19,4 +26,4 @@ const layout = ({ children }: Props) => {
   );
 };
 
-export default layout;
+export default Layout;

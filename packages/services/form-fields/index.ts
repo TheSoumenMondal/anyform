@@ -1,4 +1,4 @@
-import db, { eq, max } from "@repo/database";
+import db, { asc, eq, max } from "@repo/database";
 import { form, formField } from "@repo/database/schema";
 import slugify from "slugify";
 import {
@@ -10,7 +10,10 @@ import {
 
 class FormFieldService {
   private createFormFieldLevelKey(label: string): string {
-    return slugify(label, { lower: true, strict: true, remove: /[*+~.()'"!:@]/g });
+    const base = slugify(label, { lower: true, strict: true, remove: /[*+~.()'"!:@]/g });
+    // Append a random suffix so duplicate field types within the same form don't collide
+    const suffix = Math.random().toString(36).slice(2, 8);
+    return `${base}-${suffix}`;
   }
 
   private async getNextIndex(formId: string) {
@@ -23,6 +26,18 @@ class FormFieldService {
     const current = result[0]?.maxIndex;
     const next = current ? parseFloat(current) + 1 : 1;
     return next.toFixed(2);
+  }
+
+  public async getFormFieldsByFormId(formId: string, userId: string) {
+    await this.checkIfUserOwnsFormField(formId, userId);
+
+    const result = await db
+      .select()
+      .from(formField)
+      .where(eq(formField.formId, formId))
+      .orderBy(asc(formField.sortOrder));
+
+    return result;
   }
 
   public async checkIfUserOwnsFormField(formId: string, userId: string) {

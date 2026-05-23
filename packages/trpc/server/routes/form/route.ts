@@ -3,6 +3,8 @@ import { formFieldService, formService } from "../../services";
 import { protectedProcedure, router } from "../../trpc";
 import z from "zod";
 import {
+  archiveFormInputModel,
+  archiveFormOutputModel,
   createFormFieldInputModel,
   createFormFieldOutputModel,
   createFormInputModel,
@@ -11,7 +13,13 @@ import {
   deleteFormFieldOutputType,
   deleteFormInputModel,
   deleteFormOutputModel,
+  getFormBySlugInputModel,
+  getFormBySlugOutputModel,
   getFormByUserIdOutputModel,
+  getFormFieldsByFormIdInputModel,
+  getFormFieldsByFormIdOutputModel,
+  publishFormInputModel,
+  publishFormOutputModel,
   updateFormFieldInputModel,
   updateFormFieldOutputModel,
   updateFormInputModel,
@@ -84,6 +92,47 @@ export const formRouter = router({
       return result;
     }),
 
+  getFormBySlug: protectedProcedure
+    .meta({
+      openapi: {
+        method: "GET",
+        path: "/getFormBySlug",
+        tags: formTags,
+        protect: true,
+      },
+    })
+    .input(getFormBySlugInputModel)
+    .output(getFormBySlugOutputModel)
+    .query(async ({ ctx, input }) => {
+      const userId = ctx.user.id;
+      const { slug } = input;
+      const result = await formService.getFormBySlug({ slug, userId });
+      return result;
+    }),
+
+  getFormFieldsByFormId: protectedProcedure
+    .meta({
+      openapi: {
+        method: "GET",
+        path: "/getFormFieldsByFormId",
+        tags: formTags,
+        protect: true,
+      },
+    })
+    .input(getFormFieldsByFormIdInputModel)
+    .output(getFormFieldsByFormIdOutputModel)
+    .query(async ({ ctx, input }) => {
+      const userId = ctx.user.id;
+      const { formId } = input;
+      const result = await formFieldService.getFormFieldsByFormId(formId, userId);
+      return result.map((field) => ({
+        ...field,
+        index: field.index,
+        stepNumber: field.stepNumber ?? null,
+        dependsOnFieldId: field.dependsOnFieldId ?? null,
+      }));
+    }),
+
   updateForm: protectedProcedure
     .meta({
       openapi: {
@@ -146,6 +195,42 @@ export const formRouter = router({
         formId,
       });
       return result;
+    }),
+
+  publishForm: protectedProcedure
+    .meta({
+      openapi: {
+        method: "POST",
+        path: "/publishForm",
+        tags: formTags,
+        protect: true,
+      },
+    })
+    .input(publishFormInputModel)
+    .output(publishFormOutputModel)
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.user.id;
+      const { formId } = input;
+      const result = await formService.publishForm(formId, userId);
+      return { id: result.id };
+    }),
+
+  archiveForm: protectedProcedure
+    .meta({
+      openapi: {
+        method: "POST",
+        path: "/archiveForm",
+        tags: formTags,
+        protect: true,
+      },
+    })
+    .input(archiveFormInputModel)
+    .output(archiveFormOutputModel)
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.user.id;
+      const { formId } = input;
+      const result = await formService.archiveForm(formId, userId);
+      return { id: result.id };
     }),
 
   createFormField: protectedProcedure

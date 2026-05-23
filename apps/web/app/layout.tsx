@@ -29,7 +29,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable} ${instrumentalSerif.variable}`}>
+      <body
+        suppressHydrationWarning
+        className={`${geistSans.variable} ${geistMono.variable} ${instrumentalSerif.variable}`}
+      >
         <GlobalProviders>{children}</GlobalProviders>
       </body>
     </html>

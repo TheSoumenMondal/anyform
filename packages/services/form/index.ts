@@ -4,6 +4,8 @@ import {
   CreateFormInputType,
   deleteFormInput,
   DeleteFormInputType,
+  getFormBySlug,
+  GetFormBySlugType,
   getFormByUserId,
   GetFormByUserIdType,
   updateFormInput,
@@ -113,6 +115,34 @@ class FormService {
     return result;
   }
 
+  public async getFormBySlug(payload: GetFormBySlugType) {
+    const { slug, userId } = await getFormBySlug.parseAsync(payload);
+    const result = await db
+      .select({
+        id: form.id,
+        slug: form.slug,
+        title: form.title,
+        description: form.description,
+        formType: form.formType,
+        formStatus: form.formStatus,
+        isPublic: form.isPublic,
+        isProtected: form.isProtected,
+        maxSubmissionLimit: form.maxSubmissionLimit,
+        expiry: form.expiry,
+        createdAt: form.createdAt,
+        updatedAt: form.updatedAt,
+      })
+      .from(form)
+      .where(and(eq(form.slug, slug), eq(form.createdBy, userId), ne(form.formStatus, "deleted")))
+      .limit(1);
+
+    if (!result || result.length === 0) {
+      throw new Error("Form not found");
+    }
+
+    return result[0]!;
+  }
+
   public async updateForm(payload: UpdateFormInputType) {
     const {
       formId,
@@ -177,6 +207,36 @@ class FormService {
       .where(eq(form.id, formId));
 
     return { success: true };
+  }
+
+  public async publishForm(formId: string, userId: string) {
+    await this.checkFormOwnership(formId, userId);
+    const result = await db
+      .update(form)
+      .set({ formStatus: "published" })
+      .where(eq(form.id, formId))
+      .returning({ id: form.id });
+
+    if (!result || result.length === 0 || !result[0]?.id) {
+      throw new Error("Failed to publish form");
+    }
+
+    return result[0];
+  }
+
+  public async archiveForm(formId: string, userId: string) {
+    await this.checkFormOwnership(formId, userId);
+    const result = await db
+      .update(form)
+      .set({ formStatus: "draft" })
+      .where(eq(form.id, formId))
+      .returning({ id: form.id });
+
+    if (!result || result.length === 0 || !result[0]?.id) {
+      throw new Error("Failed to archive form");
+    }
+
+    return result[0];
   }
 }
 

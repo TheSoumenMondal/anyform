@@ -122,3 +122,28 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* ─── Scrollbar hiding (must be plain CSS, not inside @layer) ──────────── */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE / Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;             /* Chrome / Safari / Opera */
+}
+
+/* ─── Drop-in animation for new canvas fields ──────────────────────────── */
+@keyframes field-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-field-enter {
+  animation: field-enter 200ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}

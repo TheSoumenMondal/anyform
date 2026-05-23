@@ -32,6 +32,13 @@ export const getFormByUserId = z.object({
 
 export type GetFormByUserIdType = z.infer<typeof getFormByUserId>;
 
+export const getFormBySlug = z.object({
+  slug: z.string().describe("Slug of the form to retrieve"),
+  userId: z.string().describe("ID of the user requesting the form"),
+});
+
+export type GetFormBySlugType = z.infer<typeof getFormBySlug>;
+
 export const updateFormInput = z.object({
   userId: z.string().describe("ID of the user updating the form"),
   formId: z.string().describe("ID of the form to be updated"),

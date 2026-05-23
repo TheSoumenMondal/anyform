@@ -81,6 +81,72 @@ export const deleteFormOutputModel = z.object({
   success: z.boolean().describe("Whether the form was successfully deleted"),
 });
 
+export const publishFormInputModel = z.object({
+  formId: z.string().describe("ID of the form to publish"),
+});
+
+export const publishFormOutputModel = z.object({
+  id: z.string().describe("ID of the published form"),
+});
+
+export const archiveFormInputModel = z.object({
+  formId: z.string().describe("ID of the form to archive (moves back to draft)"),
+});
+
+export const archiveFormOutputModel = z.object({
+  id: z.string().describe("ID of the archived form"),
+});
+
+export const getFormBySlugInputModel = z.object({
+  slug: z.string().describe("Slug of the form"),
+});
+
+export const getFormBySlugOutputModel = z.object({
+  id: z.string().describe("ID of the form"),
+  slug: z.string().describe("Slug of the form"),
+  title: z.string().describe("Title of the form"),
+  description: z.string().nullable().describe("Description of the form"),
+  formType: z.enum(["single_step", "multi_step"]).describe("Type of the form"),
+  formStatus: z.enum(["draft", "published", "archived", "deleted"]).describe("Status of the form"),
+  isPublic: z.boolean().describe("Whether the form is public"),
+  isProtected: z.boolean().describe("Whether the form is password protected"),
+  maxSubmissionLimit: z.number().int().positive().nullable().describe("Max submissions"),
+  expiry: z.date().describe("Expiry date of the form"),
+  createdAt: z.date().describe("Creation date of the form"),
+  updatedAt: z.date().describe("Last update date of the form"),
+});
+
+export const getFormFieldsByFormIdInputModel = z.object({
+  formId: z.string().describe("ID of the form"),
+});
+
+export const getFormFieldsByFormIdOutputModel = z.array(
+  z.object({
+    id: z.string().describe("ID of the form field"),
+    formId: z.string().describe("ID of the form"),
+    label: z.string().describe("Label of the form field"),
+    labelKey: z.string().describe("Label key of the form field"),
+    description: z.string().nullable().describe("Description of the form field"),
+    helpText: z.string().nullable().describe("Help text for the form field"),
+    placeholder: z.string().nullable().describe("Placeholder text"),
+    fieldType: formFieldTypeEnum.describe("Type of the form field"),
+    isRequired: z.boolean().describe("Whether the field is required"),
+    isHidden: z.boolean().describe("Whether the field is hidden"),
+    isDisabled: z.boolean().describe("Whether the field is disabled"),
+    stepNumber: z.number().int().nullable().describe("Step number"),
+    sortOrder: z.number().int().describe("Sort order"),
+    index: z.string().describe("Index of the form field"),
+    defaultValue: z.unknown().nullable().describe("Default value"),
+    options: z.unknown().nullable().describe("Options"),
+    validation: z.unknown().nullable().describe("Validation rules"),
+    settings: z.unknown().nullable().describe("Settings"),
+    dependsOnFieldId: z.string().nullable().describe("Depends on field ID"),
+    conditionalLogic: z.unknown().nullable().describe("Conditional logic"),
+    createdAt: z.date().describe("Creation date"),
+    updatedAt: z.date().describe("Last update date"),
+  }),
+);
+
 const formFieldBaseModel = z.object({
   label: z.string().min(1).max(150).describe("Label of the form field"),
   description: z.string().max(1000).describe("Description of the form field").optional(),
