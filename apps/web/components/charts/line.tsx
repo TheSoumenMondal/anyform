@@ -186,9 +186,10 @@ export function Line({
           <ChartRevealClip
             clipPathId={`grow-clip-${dataKey}`}
             enterTransition={enterTransition}
-            height={innerHeight + 20}
+            height={innerHeight}
             revealEpoch={revealEpoch ?? 0}
             targetWidth={innerWidth}
+            padding={20}
           />
         </defs>
       ) : null}

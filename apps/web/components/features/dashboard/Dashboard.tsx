@@ -12,7 +12,9 @@ export const Dashboard = () => {
   if (analyticsIsLoading || !analyticsData) {
     return (
       <div className="w-full h-full flex items-center justify-center min-h-100">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary">
+          No data available
+        </div>
       </div>
     );
   }
@@ -20,12 +22,12 @@ export const Dashboard = () => {
   const { metrics, monthly_activity, form_records, metrics_trends } = analyticsData;
 
   return (
-    <div className="w-full h-full flex gap-4 flex-col p-4">
-      <div className="w-full flex flex-col bg-accent/50 border rounded-xl overflow-hidden shadow-sm">
+    <div className="w-full h-full flex gap-4 flex-col p-2 md:p-4">
+      <div className="w-full flex flex-col border rounded-xl overflow-hidden shadow-sm bg-accent">
         <p className="text-xl font-instrumental-serif px-6 py-3 tracking-wide border-b bg-card/50">
           Your Activity
         </p>
-        <div className="w-full h-auto flex bg-card">
+        <div className="w-full h-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 bg-card">
           <AnalyticsCard
             title="Total Submissions"
             subTitle="All time responses"
@@ -61,7 +63,7 @@ export const Dashboard = () => {
         </div>
       </div>
       <MainAnalyticsCard data={monthly_activity} />
-      <div className="bg-accent/50 border rounded-xl flex flex-col shadow-sm overflow-hidden">
+      <div className="bg-accent border rounded-xl flex flex-col shadow-sm overflow-hidden">
         <p className="text-xl font-instrumental-serif px-6 py-3 tracking-wide border-b bg-card/50">
           Recent Forms
         </p>
