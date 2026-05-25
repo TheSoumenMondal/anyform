@@ -6,6 +6,7 @@ import React, { Suspense, useState } from "react";
 import { AuthGuard } from "~/components/auth/AuthGuard";
 import { AuthGuardFallback } from "~/components/auth/AuthGuardFallback";
 import { Toaster } from "~/components/ui/sonner";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 import { trpc } from "~/trpc/client";
 import { createTRPCHttpBatchClientClient } from "~/trpc/create-client";
@@ -35,7 +36,9 @@ export const GlobalProviders: React.FC<{ children: React.ReactNode }> = ({ child
       >
         <trpc.Provider queryClient={queryClient} client={trpcClient}>
           <Suspense fallback={<AuthGuardFallback />}>
-            <AuthGuard>{children}</AuthGuard>
+            <AuthGuard>
+              <NuqsAdapter>{children}</NuqsAdapter>
+            </AuthGuard>
           </Suspense>
           <Toaster richColors position="bottom-right" />
         </trpc.Provider>
