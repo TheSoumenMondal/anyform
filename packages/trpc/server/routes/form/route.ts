@@ -13,6 +13,8 @@ import {
   deleteFormFieldOutputType,
   deleteFormInputModel,
   deleteFormOutputModel,
+  deleteFormPermanentlyInputModel,
+  getDeletedFromsByUserIdOutputModel,
   getFormBySlugInputModel,
   getFormBySlugOutputModel,
   getFormByUserIdOutputModel,
@@ -20,6 +22,8 @@ import {
   getFormFieldsByFormIdOutputModel,
   publishFormInputModel,
   publishFormOutputModel,
+  recoverFormInputModel,
+  recoverFormOutputModel,
   updateFormFieldInputModel,
   updateFormFieldOutputModel,
   updateFormInputModel,
@@ -194,6 +198,52 @@ export const formRouter = router({
         userId,
         formId,
       });
+      return result;
+    }),
+
+  recoverForm: protectedProcedure
+    .meta({
+      openapi: {
+        method: "POST",
+        path: "/recoverForm",
+        tags: formTags,
+        protect: true,
+      },
+    })
+    .input(recoverFormInputModel)
+    .output(recoverFormOutputModel)
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.user.id;
+      const { formId } = input;
+
+      const result = await formService.recoverForm({
+        userId,
+        formId,
+      });
+
+      return result;
+    }),
+
+  deleteFormPermanently: protectedProcedure
+    .meta({
+      openapi: {
+        method: "DELETE",
+        path: "/deleteFormPermanently",
+        tags: formTags,
+        protect: true,
+      },
+    })
+    .input(deleteFormPermanentlyInputModel)
+    .output(deleteFormOutputModel)
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.user.id;
+      const { formId } = input;
+
+      const result = await formService.deleteFormPermanently({
+        userId,
+        formId,
+      });
+
       return result;
     }),
 
@@ -405,5 +455,23 @@ export const formRouter = router({
       }
 
       return { success: true };
+    }),
+
+  getDeletedForms: protectedProcedure
+    .meta({
+      openapi: {
+        method: "GET",
+        path: "/getDeletedForms",
+        tags: formTags,
+        protect: true,
+      },
+    })
+    .input(zodUndefinedModel)
+    .output(getDeletedFromsByUserIdOutputModel)
+    .query(async ({ ctx }) => {
+      const userId = ctx.user.id;
+      const result = await formService.getDeletedForms({ userId });
+
+      return result;
     }),
 });

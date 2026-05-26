@@ -4,10 +4,16 @@ import {
   CreateFormInputType,
   deleteFormInput,
   DeleteFormInputType,
+  deleteFormPermanentlyInput,
+  DeleteFormPermanentlyInputType,
+  getDeletedFormsInput,
+  GetDeletedFormsInputType,
   getFormBySlug,
   GetFormBySlugType,
   getFormByUserId,
   GetFormByUserIdType,
+  recoverFormInput,
+  RecoverFormInputType,
   updateFormInput,
   UpdateFormInputType,
 } from "./model";
@@ -42,6 +48,33 @@ class FormService {
 
     if (existingForm.createdBy !== userId) {
       throw new Error("Unauthorized: You do not own this form");
+    }
+
+    return existingForm;
+  }
+
+  private async checkDeletedFormOwnership(formId: string, userId: string) {
+    const formData = await db
+      .select({
+        createdBy: form.createdBy,
+        formStatus: form.formStatus,
+      })
+      .from(form)
+      .where(eq(form.id, formId))
+      .limit(1);
+
+    const existingForm = formData[0];
+
+    if (!existingForm) {
+      throw new Error("Form not found");
+    }
+
+    if (existingForm.createdBy !== userId) {
+      throw new Error("Unauthorized: You do not own this form");
+    }
+
+    if (existingForm.formStatus !== "deleted") {
+      throw new Error("Form must be deleted before it can be recovered or permanently deleted");
     }
 
     return existingForm;
@@ -209,6 +242,32 @@ class FormService {
     return { success: true };
   }
 
+  public async recoverForm(payload: RecoverFormInputType) {
+    const { formId, userId } = await recoverFormInput.parseAsync(payload);
+    await this.checkDeletedFormOwnership(formId, userId);
+
+    const result = await db
+      .update(form)
+      .set({ formStatus: "draft" })
+      .where(eq(form.id, formId))
+      .returning({ id: form.id });
+
+    if (!result || result.length === 0 || !result[0]?.id) {
+      throw new Error("Failed to recover form");
+    }
+
+    return result[0];
+  }
+
+  public async deleteFormPermanently(payload: DeleteFormPermanentlyInputType) {
+    const { formId, userId } = await deleteFormPermanentlyInput.parseAsync(payload);
+    await this.checkDeletedFormOwnership(formId, userId);
+
+    await db.delete(form).where(eq(form.id, formId));
+
+    return { success: true };
+  }
+
   public async publishForm(formId: string, userId: string) {
     await this.checkFormOwnership(formId, userId);
     const result = await db
@@ -237,6 +296,15 @@ class FormService {
     }
 
     return result[0];
+  }
+
+  async getDeletedForms(payload: GetDeletedFormsInputType) {
+    const { userId } = await getDeletedFormsInput.parseAsync(payload);
+    const result = await db
+      .select()
+      .from(form)
+      .where(and(eq(form.createdBy, userId), eq(form.formStatus, "deleted")));
+    return result;
   }
 }
 

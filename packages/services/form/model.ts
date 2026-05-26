@@ -65,3 +65,23 @@ export const deleteFormInput = z.object({
 });
 
 export type DeleteFormInputType = z.infer<typeof deleteFormInput>;
+
+export const recoverFormInput = z.object({
+  userId: z.string().describe("ID of the user recovering the form"),
+  formId: z.string().describe("ID of the form to recover"),
+});
+
+export type RecoverFormInputType = z.infer<typeof recoverFormInput>;
+
+export const deleteFormPermanentlyInput = z.object({
+  userId: z.string().describe("ID of the user permanently deleting the form"),
+  formId: z.string().describe("ID of the form to permanently delete"),
+});
+
+export type DeleteFormPermanentlyInputType = z.infer<typeof deleteFormPermanentlyInput>;
+
+export const getDeletedFormsInput = z.object({
+  userId: z.string().describe("ID of the user whose deleted forms are to be retrieved"),
+});
+
+export type GetDeletedFormsInputType = z.infer<typeof getDeletedFormsInput>;

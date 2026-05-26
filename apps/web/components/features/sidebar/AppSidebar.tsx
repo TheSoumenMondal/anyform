@@ -22,6 +22,7 @@ import {
   LicenseDraftIcon,
   Settings02Icon,
   StoreAdd02Icon,
+  Trash2,
 } from "@hugeicons/core-free-icons";
 import FlowerLogo from "~/components/common/flower";
 import { ThemeToggle } from "~/components/common/Theme-Toggle";
@@ -46,6 +47,11 @@ const data: SidebarItem[] = [
     label: "Form",
     url: "/form",
     icon: LicenseDraftIcon,
+  },
+  {
+    label: "Trash",
+    url: "/trash",
+    icon: Trash2,
   },
   {
     label: "Analytics",

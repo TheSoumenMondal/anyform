@@ -81,6 +81,18 @@ export const deleteFormOutputModel = z.object({
   success: z.boolean().describe("Whether the form was successfully deleted"),
 });
 
+export const recoverFormInputModel = z.object({
+  formId: z.string().describe("ID of the form to recover"),
+});
+
+export const recoverFormOutputModel = z.object({
+  id: z.string().describe("ID of the recovered form"),
+});
+
+export const deleteFormPermanentlyInputModel = z.object({
+  formId: z.string().describe("ID of the form to permanently delete"),
+});
+
 export const publishFormInputModel = z.object({
   formId: z.string().describe("ID of the form to publish"),
 });
@@ -211,3 +223,27 @@ export const deleteFormFieldInputType = z.object({
 export const deleteFormFieldOutputType = z.object({
   success: z.boolean().describe("Whether the form field was successfully deleted"),
 });
+
+export const getDeletedFromsByUserIdOutputModel = z.array(
+  z.object({
+    id: z.string().describe("ID of the form"),
+    slug: z.string().describe("Slug of the form"),
+    title: z.string().describe("Title of the form"),
+    description: z.string().nullable().describe("Description of the form"),
+    formType: z.enum(["single_step", "multi_step"]).describe("Type of the form"),
+    formStatus: z
+      .enum(["draft", "published", "archived", "deleted"])
+      .describe("Status of the form"),
+    isPublic: z.boolean().describe("Whether the form is public"),
+    isProtected: z.boolean().describe("Whether the form is password protected"),
+    maxSubmissionLimit: z
+      .number()
+      .int()
+      .positive()
+      .nullable()
+      .describe("Maximum number of submissions allowed"),
+    expiry: z.date().describe("Expiry date of the form"),
+    createdAt: z.date().describe("Creation date of the form"),
+    updatedAt: z.date().describe("Last update date of the form"),
+  }),
+);
