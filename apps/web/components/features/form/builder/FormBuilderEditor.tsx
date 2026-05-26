@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { DragDropContext, DropResult } from "react-beautiful-dnd";
+import { DragDropContext, DropResult } from "@hello-pangea/dnd";
 import { FieldPalette } from "./FieldPalette";
 import { FormCanvas } from "./FormCanvas";
 import { FieldPropertiesPanel } from "./FieldPropertiesPanel";
@@ -14,6 +14,12 @@ import { FIELD_TYPE_MAP } from "./field-palette-config";
 import { Loader2Icon } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
+
+type FormDetails = {
+  id: string;
+  formType: "single_step" | "multi_step";
+  formStatus: "draft" | "published" | "archived" | "deleted";
+};
 
 export type CanvasField = {
   id: string;
@@ -31,10 +37,12 @@ export type CanvasField = {
 
 type FormBuilderEditorProps = {
   slug: string;
+  form?: FormDetails | null;
 };
 
-export const FormBuilderEditor = ({ slug }: FormBuilderEditorProps) => {
-  const { form, formIsLoading } = useFormBySlug(slug);
+export const FormBuilderEditor = ({ slug, form: formProp }: FormBuilderEditorProps) => {
+  const { form: loadedForm, formIsLoading } = useFormBySlug(slug);
+  const form = formProp ?? loadedForm;
   const { formFields, formFieldsIsLoading, refetchFormFields } = useFormFields(form?.id || "");
   const { createFormFieldAsync } = useCreateFormField();
   const { updateFormFieldAsync } = useUpdateFormField();
@@ -217,7 +225,7 @@ export const FormBuilderEditor = ({ slug }: FormBuilderEditorProps) => {
     setFields((prev) => prev.map((f) => (f.id === id ? { ...f, ...updates } : f)));
   };
 
-  if (formIsLoading || formFieldsIsLoading) {
+  if ((formProp ? false : formIsLoading) || formFieldsIsLoading) {
     return (
       <div className="flex h-full flex-1 items-center justify-center">
         <Loader2Icon className="size-8 animate-spin text-muted-foreground" />

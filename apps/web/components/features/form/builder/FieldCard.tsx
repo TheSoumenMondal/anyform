@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Draggable } from "react-beautiful-dnd";
+import { Draggable } from "@hello-pangea/dnd";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   DragDropVerticalIcon,
