@@ -1,23 +1,22 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Image from "next/image";
 import { useForm, FormProvider, Controller, type Control, type FieldValues } from "react-hook-form";
-import GamingCard from "./Card";
-import GamingButton from "./Button";
-import GamingInput from "./Input";
-import GamingCheckbox from "./Checkbox";
+import AnimeCard from "./Card";
+import AnimeButton from "./Button";
+import AnimeInput from "./Input";
+import AnimeCheckbox from "./Checkbox";
 import { RadioGroup, RadioGroupItem } from "./RadioGroup";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./Select";
-import GamingSlider from "./Slider";
-import GamingTextarea from "./Textarea";
-import GamingRating from "./Rating";
+import AnimeSlider from "./Slider";
+import AnimeTextarea from "./Textarea";
+import AnimeRating from "./Rating";
 import { usePublicFormBySlug } from "~/hooks/api/form/use-public-form-by-slug";
 import { usePublicFormFields } from "~/hooks/api/form/use-public-form-fields";
 import { useSubmitFormResponse } from "~/hooks/api/form/use-submit-form-response";
 import { Skeleton } from "~/components/ui/skeleton";
 import { toast } from "sonner";
-import { CheckCircleIcon } from "lucide-react";
+import { HeartIcon } from "lucide-react";
 import { trpc } from "~/trpc/client";
 
 type FormFieldOption = {
@@ -45,60 +44,42 @@ type FormField = {
   validation?: FormFieldValidation;
 };
 
-type GameThemeProps = {
+type AnimeThemeProps = {
   slug: string;
 };
 
 const SuccessDisplay = ({ title, message }: { title: string; message: string }) => (
-  <div className="w-full min-h-screen relative overflow-hidden flex items-center justify-center p-8">
-    <div className="fixed inset-0 -z-10">
-      <Image
-        src="/theme/game/game-desktop.jpg"
-        alt="Game Theme Background"
-        fill
-        className="object-cover"
-        priority
-      />
-      <div className="absolute inset-0 bg-black/60" />
-    </div>
-    <GamingCard className="w-full max-w-md p-8 text-center">
+  <div
+    className="w-full min-h-screen relative overflow-hidden flex items-center justify-center p-2 sm:p-8 font-sans bg-[#11100f] bg-cover bg-center bg-no-repeat bg-fixed"
+    style={{ backgroundImage: "url('/theme/anime/anime-desktop.png')" }}
+  >
+    <AnimeCard className="w-full max-w-md p-4 sm:p-8 text-center">
       <div className="flex justify-center mb-6">
-        <div className="p-4 bg-[#3de03d] border-4 border-[#1e1e1e] shadow-[4px_4px_0px_#1e1e1e]">
-          <CheckCircleIcon className="size-12 text-white" />
+        <div className="p-4 bg-[#c41e3a]/10 rounded-none shadow-[0_0_15px_rgba(196,30,58,0.2)]">
+          <HeartIcon className="size-12 text-[#c41e3a] fill-[#c41e3a]" />
         </div>
       </div>
-      <h1 className="text-3xl font-bold text-[#3de03d] [text-shadow:2px_2px_0px_#ffffff] uppercase tracking-widest mb-4">
-        {title}
-      </h1>
-      <p className="text-[#4e4e4e] font-bold uppercase text-sm mb-6">{message}</p>
-      <GamingButton variant="success" onClick={() => window.location.reload()}>
-        New Game
-      </GamingButton>
-    </GamingCard>
+      <h1 className="text-3xl font-serif text-white tracking-wide mb-4">{title}</h1>
+      <p className="text-gray-400 font-medium text-sm mb-6">{message}</p>
+      <AnimeButton variant="success" onClick={() => window.location.reload()}>
+        Submit Another
+      </AnimeButton>
+    </AnimeCard>
   </div>
 );
 
 const ErrorDisplay = ({ title, message }: { title: string; message: string }) => (
-  <div className="w-full min-h-screen relative overflow-hidden flex items-center justify-center p-8">
-    <div className="fixed inset-0 -z-10">
-      <Image
-        src="/theme/game/game-desktop.jpg"
-        alt="Game Theme Background"
-        fill
-        className="object-cover grayscale"
-        priority
-      />
-      <div className="absolute inset-0 bg-black/60" />
-    </div>
-    <GamingCard className="w-full max-w-md p-8 text-center">
-      <h1 className="text-3xl font-bold text-red-600 [text-shadow:2px_2px_0px_#ffffff] uppercase tracking-widest mb-4">
-        {title}
-      </h1>
-      <p className="text-[#4e4e4e] font-bold uppercase text-sm mb-6">{message}</p>
-      <GamingButton variant="danger" onClick={() => (window.location.href = "/")}>
-        Exit to Menu
-      </GamingButton>
-    </GamingCard>
+  <div
+    className="w-full min-h-screen relative overflow-hidden flex items-center justify-center p-2 sm:p-8 font-sans bg-[#11100f] bg-cover bg-center bg-no-repeat bg-fixed"
+    style={{ backgroundImage: "url('/theme/anime/anime-desktop.png')" }}
+  >
+    <AnimeCard className="w-full max-w-md p-4 sm:p-8 text-center">
+      <h1 className="text-3xl font-serif text-red-500 tracking-wide mb-4">{title}</h1>
+      <p className="text-gray-400 font-medium text-sm mb-6">{message}</p>
+      <AnimeButton variant="danger" onClick={() => (window.location.href = "/")}>
+        Return Home
+      </AnimeButton>
+    </AnimeCard>
   </div>
 );
 
@@ -115,50 +96,35 @@ const PasswordPrompt = ({ formId, onSuccess }: { formId: string; onSuccess: () =
   });
 
   return (
-    <div className="w-full min-h-screen relative overflow-hidden flex items-center justify-center p-8">
-      <div className="fixed inset-0 -z-10">
-        <Image
-          src="/theme/game/game-desktop.jpg"
-          alt="Game Theme Background"
-          fill
-          className="object-cover grayscale"
-          priority
-        />
-        <div className="absolute inset-0 bg-black/60" />
-      </div>
-      <GamingCard className="w-full max-w-md p-8 text-center">
-        <h1 className="text-3xl font-bold text-[#ffae42] [text-shadow:2px_2px_0px_#ffffff] uppercase tracking-widest mb-4">
-          Restricted Area
-        </h1>
-        <p className="text-[#4e4e4e] font-bold uppercase text-sm mb-6">
-          Enter password to unlock this form.
+    <div
+      className="w-full min-h-screen relative overflow-hidden flex items-center justify-center p-2 sm:p-8 font-sans bg-[#11100f] bg-cover bg-center bg-no-repeat bg-fixed"
+      style={{ backgroundImage: "url('/theme/anime/anime-desktop.png')" }}
+    >
+      <AnimeCard className="w-full max-w-md p-4 sm:p-8 text-center">
+        <h1 className="text-3xl font-serif text-white tracking-wide mb-4">Secret Area</h1>
+        <p className="text-gray-400 font-medium text-sm mb-6">
+          Enter password to unlock this magical form.
         </p>
         <div className="flex flex-col gap-4">
-          <GamingInput
+          <AnimeInput
             type="password"
-            placeholder="Enter Password"
+            placeholder="Enter Password..."
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                verifyMutation.mutate({ formId, password });
-              }
-            }}
           />
-          <GamingButton
-            variant="default"
+          <AnimeButton
             onClick={() => verifyMutation.mutate({ formId, password })}
-            disabled={verifyMutation.isPending || !password}
+            disabled={verifyMutation.isPending}
           >
-            {verifyMutation.isPending ? "Unlocking..." : "Unlock"}
-          </GamingButton>
+            {verifyMutation.isPending ? "Unlocking..." : "Unlock Form"}
+          </AnimeButton>
         </div>
-      </GamingCard>
+      </AnimeCard>
     </div>
   );
 };
 
-const GameTheme = ({ slug }: GameThemeProps) => {
+const AnimeTheme = ({ slug }: AnimeThemeProps) => {
   const { form, formIsLoading, formIsError } = usePublicFormBySlug(slug);
   const { formFields, formFieldsIsLoading, formFieldsError, formFieldsIsError, refetchFormFields } =
     usePublicFormFields(form?.id || "");
@@ -211,18 +177,21 @@ const GameTheme = ({ slug }: GameThemeProps) => {
 
   if (formIsLoading || (formFieldsIsLoading && !isUnauthorized)) {
     return (
-      <div className="w-full min-h-screen flex items-center justify-center p-8 bg-[#1e1e1e]">
-        <GamingCard className="w-full max-w-xl p-8">
+      <div
+        className="w-full min-h-screen flex items-center justify-center p-2 sm:p-8 bg-[#11100f] bg-cover bg-center bg-no-repeat bg-fixed"
+        style={{ backgroundImage: "url('/theme/anime/anime-desktop.png')" }}
+      >
+        <AnimeCard className="w-full max-w-xl p-4 sm:p-8">
           <div className="flex flex-col gap-6">
-            <Skeleton className="h-10 w-3/4 mx-auto bg-neutral-700" />
-            <Skeleton className="h-6 w-1/2 mx-auto bg-neutral-700" />
+            <Skeleton className="h-10 w-3/4 mx-auto bg-white/10" />
+            <Skeleton className="h-6 w-1/2 mx-auto bg-white/10" />
             <div className="space-y-4">
-              <Skeleton className="h-20 w-full bg-neutral-700" />
-              <Skeleton className="h-20 w-full bg-neutral-700" />
-              <Skeleton className="h-20 w-full bg-neutral-700" />
+              <Skeleton className="h-20 w-full bg-white/5" />
+              <Skeleton className="h-20 w-full bg-white/5" />
+              <Skeleton className="h-20 w-full bg-white/5" />
             </div>
           </div>
-        </GamingCard>
+        </AnimeCard>
       </div>
     );
   }
@@ -230,8 +199,8 @@ const GameTheme = ({ slug }: GameThemeProps) => {
   if (formIsError || !form) {
     return (
       <ErrorDisplay
-        title="Level Not Found"
-        message="The world you are looking for does not exist or has been deleted."
+        title="Form Not Found"
+        message="The page you are looking for does not exist or has been deleted."
       />
     );
   }
@@ -239,8 +208,8 @@ const GameTheme = ({ slug }: GameThemeProps) => {
   if (submitFormResponseIsSuccess) {
     return (
       <SuccessDisplay
-        title="Mission Accomplished"
-        message="Your response has been saved to the database. Great job, player!"
+        title="Mission Accomplished!"
+        message="Your response has been magically saved. Thank you!"
       />
     );
   }
@@ -249,7 +218,7 @@ const GameTheme = ({ slug }: GameThemeProps) => {
   if (isExpired) {
     return (
       <ErrorDisplay
-        title="Mission Expired"
+        title="Time's Up!"
         message="This form has reached its expiry date and is no longer accepting submissions."
       />
     );
@@ -258,8 +227,8 @@ const GameTheme = ({ slug }: GameThemeProps) => {
   if (form.formStatus !== "published") {
     return (
       <ErrorDisplay
-        title="Not Published"
-        message="This form is currently not published and cannot accept submissions."
+        title="Not Available"
+        message="This form is currently resting and cannot accept submissions."
       />
     );
   }
@@ -282,8 +251,6 @@ const GameTheme = ({ slug }: GameThemeProps) => {
   const currentFields = fieldsByStep[steps[currentStepIndex] ?? "1"] || [];
 
   const onSubmit = async (data: Record<string, unknown>) => {
-    // Safety Guard: If user somehow triggers submit on intermediate levels,
-    // we redirect them to the next level instead of submitting.
     if (isMultiStep && currentStepIndex < maxSteps - 1) {
       await nextStep();
       return;
@@ -324,125 +291,98 @@ const GameTheme = ({ slug }: GameThemeProps) => {
   };
 
   return (
-    <div className="w-full min-h-screen relative overflow-hidden flex items-center justify-center p-8">
-      <div className="fixed inset-0 -z-10">
-        <Image
-          src="/theme/game/game-desktop.jpg"
-          alt="Game Theme Background"
-          fill
-          className="object-cover"
-          priority
-        />
-        <div className="absolute inset-0 bg-black/40" />
-      </div>
-
-      <GamingCard className="w-full max-w-xl">
-        <div className="max-h-[80vh] overflow-y-auto custom-scrollbar p-2">
-          <div className="flex flex-col gap-8">
+    <div
+      className="w-full min-h-screen relative overflow-hidden flex items-center justify-center p-2 sm:p-8 font-sans bg-[#11100f] bg-cover bg-center bg-no-repeat bg-fixed"
+      style={{ backgroundImage: "url('/theme/anime/anime-desktop.png')" }}
+    >
+      <AnimeCard className="w-full max-w-xl">
+        <div className="max-h-[80vh] overflow-y-auto scrollbar-hide p-2 sm:p-4">
+          <div className="flex flex-col gap-6">
             <div className="text-center">
-              <h1 className="text-3xl font-bold text-[#373737] [text-shadow:2px_2px_0px_#ffffff] uppercase tracking-[0.2em]">
+              <h1 className="text-4xl font-serif text-white tracking-tight leading-tight">
                 {form.title}
               </h1>
               {form.description && (
-                <p className="mt-2 text-[#4e4e4e] font-medium text-sm">{form.description}</p>
+                <p className="mt-4 text-gray-400 font-medium text-sm max-w-md mx-auto">
+                  {form.description}
+                </p>
               )}
               {isMultiStep && maxSteps > 1 && (
-                <div className="mt-6 flex flex-col items-center gap-3">
-                  <div className="flex w-full max-w-xs items-center gap-1.5 px-2">
+                <div className="mt-8 flex flex-col items-center gap-3">
+                  <div className="flex w-full max-w-xs items-center gap-2 px-2">
                     {steps.map((_, index) => (
                       <div
                         key={index}
-                        className={`h-2.5 flex-1 border-2 border-[#1e1e1e] shadow-[1px_1px_0px_0px_rgba(255,255,255,0.2)] ${
-                          index <= currentStepIndex ? "bg-[#3de03d]" : "bg-[#313131]"
+                        className={`h-1.5 flex-1 rounded-none transition-all duration-300 ${
+                          index <= currentStepIndex ? "bg-[#c41e3a]" : "bg-white/10"
                         }`}
                       />
                     ))}
                   </div>
-                  <span className="text-[10px] font-black text-[#4e4e4e] uppercase tracking-[0.2em]">
-                    Level {currentStepIndex + 1} of {maxSteps}
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500">
+                    Step {currentStepIndex + 1} of {maxSteps}
                   </span>
                 </div>
               )}
             </div>
 
             <FormProvider {...methods}>
-              <form
-                onSubmit={handleSubmit(onSubmit)}
-                className="flex flex-col gap-6"
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && e.target instanceof HTMLInputElement) {
-                    if (isMultiStep && currentStepIndex < maxSteps - 1) {
-                      nextStep(e as unknown as React.MouseEvent);
-                    } else {
-                      // Do not prevent default if on last step, let it submit
-                    }
-                  }
-                }}
-              >
-                {currentFields
-                  .sort((a, b) => a.sortOrder - b.sortOrder)
-                  .map((field) => (
+              <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
+                <div className="flex flex-col gap-6">
+                  {currentFields.map((field) => (
                     <div key={field.id} className="flex flex-col gap-3">
-                      <label className="text-xs font-bold text-[#4e4e4e] uppercase tracking-wider flex items-center gap-2">
+                      <label className="text-sm font-semibold text-gray-300 ml-1">
                         {field.label}
-                        {field.isRequired && <span className="text-red-600">*</span>}
+                        {field.isRequired && <span className="text-[#c41e3a] ml-1">*</span>}
                       </label>
                       <FormFieldRenderer field={field} control={control} />
                       {errors[field.labelKey] && (
-                        <p className="text-xs font-bold text-red-600 uppercase">
+                        <p className="text-xs font-medium text-red-400 ml-1">
                           {errors[field.labelKey]?.message as string}
                         </p>
                       )}
                     </div>
                   ))}
+                </div>
 
-                <div className="flex justify-between gap-4 mt-6">
+                <div className="flex justify-between gap-4 mt-8 pt-4 border-t border-white/5">
                   {isMultiStep && currentStepIndex > 0 && (
-                    <GamingButton type="button" variant="danger" onClick={prevStep}>
-                      Previous
-                    </GamingButton>
+                    <AnimeButton
+                      type="button"
+                      variant="default"
+                      onClick={prevStep}
+                      className="bg-white/5 hover:bg-white/10 text-white border border-white/10"
+                    >
+                      Back
+                    </AnimeButton>
                   )}
                   <div className="flex-1" />
                   {isMultiStep && currentStepIndex < maxSteps - 1 ? (
-                    <GamingButton
+                    <AnimeButton
                       type="button"
                       variant="success"
-                      className="min-w-30"
+                      className="min-w-35"
                       onClick={(e) => nextStep(e)}
                       disabled={isTransitioning}
                     >
-                      {isTransitioning ? "Loading..." : "Next Level"}
-                    </GamingButton>
+                      {isTransitioning ? "Loading..." : "Next Step"}
+                    </AnimeButton>
                   ) : (
-                    <GamingButton
+                    <AnimeButton
                       type="submit"
                       variant="success"
-                      className="min-w-30"
+                      className="min-w-35"
                       disabled={submitFormResponseIsPending || isTransitioning}
                     >
-                      {submitFormResponseIsPending ? "Submitting..." : "Submit"}
-                    </GamingButton>
+                      {submitFormResponseIsPending ? "Sending..." : "Submit Response"}
+                    </AnimeButton>
                   )}
                 </div>
               </form>
             </FormProvider>
           </div>
         </div>
-      </GamingCard>
-
-      <style
-        dangerouslySetInnerHTML={{
-          __html: `
-        .custom-scrollbar {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-        .custom-scrollbar::-webkit-scrollbar {
-          display: none;
-        }
-      `,
-        }}
-      />
+      </AnimeCard>
     </div>
   );
 };
@@ -477,7 +417,7 @@ const FormFieldRenderer = ({
           control={control}
           rules={{ required: field.isRequired ? "This field is required" : false }}
           render={({ field: { onChange, value } }) => (
-            <GamingInput
+            <AnimeInput
               type={
                 field.fieldType === "number"
                   ? "number"
@@ -492,13 +432,6 @@ const FormFieldRenderer = ({
               placeholder={field.placeholder || "Enter value..."}
               onChange={onChange}
               value={(value as string) || ""}
-              className={
-                field.fieldType === "date" ||
-                field.fieldType === "time" ||
-                field.fieldType === "datetime-local"
-                  ? "scheme-dark"
-                  : ""
-              }
             />
           )}
         />
@@ -511,8 +444,8 @@ const FormFieldRenderer = ({
           control={control}
           rules={{ required: field.isRequired ? "This field is required" : false }}
           render={({ field: { onChange, value } }) => (
-            <GamingTextarea
-              placeholder={field.placeholder || "Describe..."}
+            <AnimeTextarea
+              placeholder={field.placeholder || "Type here..."}
               onChange={onChange}
               value={(value as string) || ""}
             />
@@ -529,7 +462,7 @@ const FormFieldRenderer = ({
           render={({ field: { onChange, value } }) => (
             <Select onValueChange={onChange} value={value as string}>
               <SelectTrigger>
-                <SelectValue placeholder={field.placeholder || "Select mode"} />
+                <SelectValue placeholder={field.placeholder || "Select option"} />
               </SelectTrigger>
               <SelectContent>
                 {options.map((opt) => (
@@ -557,7 +490,7 @@ const FormFieldRenderer = ({
                     <RadioGroupItem value={opt.value} id={`${field.id}-${index}`} />
                     <label
                       htmlFor={`${field.id}-${index}`}
-                      className="text-sm font-medium text-[#373737]"
+                      className="text-sm font-medium text-gray-300"
                     >
                       {opt.label}
                     </label>
@@ -578,8 +511,8 @@ const FormFieldRenderer = ({
           rules={{ required: field.isRequired ? "This field is required" : false }}
           render={({ field: { onChange, value } }) => (
             <div className="flex items-center gap-3">
-              <GamingCheckbox id={field.id} onCheckedChange={onChange} checked={!!value} />
-              <label htmlFor={field.id} className="text-sm font-medium text-[#373737]">
+              <AnimeCheckbox id={field.id} onCheckedChange={onChange} checked={!!value} />
+              <label htmlFor={field.id} className="text-sm font-medium text-gray-300">
                 {field.placeholder || "Enable"}
               </label>
             </div>
@@ -594,7 +527,7 @@ const FormFieldRenderer = ({
           control={control}
           rules={{ required: field.isRequired ? "This field is required" : false }}
           render={({ field: { onChange, value } }) => (
-            <GamingSlider
+            <AnimeSlider
               defaultValue={[field.validation?.min || 0]}
               max={field.validation?.max || 100}
               step={field.validation?.step || 1}
@@ -612,7 +545,7 @@ const FormFieldRenderer = ({
           control={control}
           rules={{ required: field.isRequired ? "This field is required" : false }}
           render={({ field: { onChange, value } }) => (
-            <GamingRating
+            <AnimeRating
               max={field.validation?.max || 5}
               onChange={onChange}
               value={value as number}
@@ -623,11 +556,11 @@ const FormFieldRenderer = ({
 
     default:
       return (
-        <div className="p-4 border-2 border-dashed border-red-500 text-red-500 text-xs font-bold uppercase">
+        <div className="p-4 border border-red-900/50 bg-red-900/10 text-red-500 text-xs font-bold uppercase rounded-none">
           Unsupported Field Type: {field.fieldType}
         </div>
       );
   }
 };
 
-export default GameTheme;
+export default AnimeTheme;

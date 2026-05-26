@@ -1,5 +1,5 @@
 import React from "react";
-import GameTheme from "~/components/themes/game/GameTheme";
+import AnimeTheme from "~/components/themes/anime/AnimeTheme";
 
 type Props = {
   params: Promise<{
@@ -11,7 +11,7 @@ const page = async ({ params }: Props) => {
   const { slug } = await params;
   return (
     <div className="w-full h-screen">
-      <GameTheme slug={slug} />
+      <AnimeTheme slug={slug} />
     </div>
   );
 };

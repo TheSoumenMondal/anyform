@@ -78,7 +78,7 @@ export default function IndividualFormAnalyticsPage() {
 
   if (analyticsIsLoading) {
     return (
-      <div className="w-full h-full flex flex-col items-center justify-center min-h-[500px]">
+      <div className="w-full h-full flex flex-col items-center justify-center min-h-125">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         <span className="ml-3 mt-4 text-muted-foreground font-medium">
           Loading form analytics...
@@ -89,7 +89,7 @@ export default function IndividualFormAnalyticsPage() {
 
   if (analyticsIsError || !analyticsData) {
     return (
-      <div className="w-full h-full flex flex-col items-center justify-center min-h-[500px]">
+      <div className="w-full h-full flex flex-col items-center justify-center min-h-125">
         <span className="text-destructive font-medium">Failed to load analytics</span>
       </div>
     );
@@ -142,7 +142,6 @@ export default function IndividualFormAnalyticsPage() {
           </div>
         </div>
 
-        {/* Responses Table */}
         <div className="bg-accent border rounded-xl flex flex-col shadow-sm overflow-hidden mt-8">
           <div className="px-6 py-4 border-b border-border/50 bg-accent text-foreground">
             <h2 className="text-xl font-instrumental-serif">Form Responses</h2>
