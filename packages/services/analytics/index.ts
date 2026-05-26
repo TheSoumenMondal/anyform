@@ -6,8 +6,13 @@ import {
   analyticsOutputSchema,
   YearlyDailyAnalyticsOutput,
   yearlyDailyAnalyticsOutputSchema,
+  getIndividualFormAnalyticsInput,
+  GetIndividualFormAnalyticsInputType,
+  IndividualFormAnalyticsOutput,
+  individualFormAnalyticsOutputSchema,
 } from "./model";
-import { form, formSubmission } from "@repo/database/schema";
+import { form, formField, formResponse, formSubmission } from "@repo/database/schema";
+import { eq, inArray, desc } from "@repo/database";
 
 class AnalyticsService {
   public async asyncGetAnalytics(payload: GetAnalyticsInputType): Promise<AnalyticsOutput> {
@@ -16,7 +21,7 @@ class AnalyticsService {
       const analytics = await db.execute(sql`
         WITH 
         active_forms_def AS (
-          SELECT id, title, form_status, form_expiry, created_at
+          SELECT id, title, slug, form_status, form_expiry, created_at
           FROM ${form}
           WHERE form_status != 'deleted'
             AND created_by = ${userId} 
@@ -35,6 +40,7 @@ class AnalyticsService {
           SELECT 
             f.id,
             f.title,
+            f.slug,
             f.form_status,
             f.form_expiry,
             COALESCE(s.submitted_count, 0) AS submitted_count,
@@ -196,6 +202,7 @@ class AnalyticsService {
                     ELSE NULL
                   END,
                 'form_id', fc.id,
+                'slug', fc.slug,
                 'trend', (
                   SELECT jsonb_agg(jsonb_build_object('date', fdt.day_start, 'value', fdt.count) ORDER BY fdt.day_start)
                   FROM form_daily_trend fdt
@@ -292,6 +299,155 @@ class AnalyticsService {
       }
 
       const parsed = yearlyDailyAnalyticsOutputSchema.safeParse(result);
+      if (!parsed.success) {
+        throw parsed.error;
+      }
+
+      return parsed.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  public async asyncGetIndividualFormAnalytics(
+    payload: GetIndividualFormAnalyticsInputType,
+  ): Promise<IndividualFormAnalyticsOutput> {
+    try {
+      const { userId, slug } = await getIndividualFormAnalyticsInput.parseAsync(payload);
+
+      // Verify form ownership
+      const formData = await db
+        .select({ id: form.id })
+        .from(form)
+        .where(eq(form.slug, slug))
+        .limit(1);
+
+      if (!formData[0]) {
+        throw new Error("Form not found");
+      }
+      const formId = formData[0].id;
+
+      // 1. Heatmap Data (Hour vs Day of week)
+      // dayOfWeek: 0 = Sunday, 1 = Monday, etc. PostgreSQL EXTRACT(DOW) returns 0-6 where 0=Sunday
+      const heatmapQuery = await db.execute(sql`
+        SELECT 
+          EXTRACT(HOUR FROM submitted_at)::int AS hour,
+          EXTRACT(DOW FROM submitted_at)::int AS day_of_week,
+          COUNT(*)::int AS count
+        FROM ${formSubmission}
+        WHERE form_id = ${formId} AND status = 'submitted'
+        GROUP BY hour, day_of_week
+      `);
+
+      const heatmap = heatmapQuery.rows.map((row) => ({
+        hour: Number(row.hour),
+        dayOfWeek: Number(row.day_of_week),
+        count: Number(row.count),
+      }));
+
+      // 2. Trend Data (Daily submissions over last 30 days)
+      const trendQuery = await db.execute(sql`
+        WITH daily_series AS (
+          SELECT day_start
+          FROM generate_series(
+            date_trunc('day', now() - interval '29 days'),
+            date_trunc('day', now()),
+            interval '1 day'
+          ) AS day_start
+        ),
+        daily_submissions AS (
+          SELECT 
+            date_trunc('day', submitted_at) AS day_start,
+            COUNT(*) AS count
+          FROM ${formSubmission}
+          WHERE form_id = ${formId} AND status = 'submitted'
+            AND submitted_at >= date_trunc('day', now() - interval '29 days')
+          GROUP BY date_trunc('day', submitted_at)
+        )
+        SELECT 
+          to_char(ds.day_start, 'YYYY-MM-DD') AS date,
+          COALESCE(sub.count, 0)::int AS value
+        FROM daily_series ds
+        LEFT JOIN daily_submissions sub ON ds.day_start = sub.day_start
+        ORDER BY ds.day_start ASC
+      `);
+
+      const trend = trendQuery.rows.map((row) => ({
+        date: String(row.date),
+        value: Number(row.value),
+      }));
+
+      // 3. Form Fields
+      const formFields = await db
+        .select({
+          id: formField.id,
+          label: formField.label,
+          key: formField.labelKey,
+        })
+        .from(formField)
+        .where(eq(formField.formId, formId))
+        .orderBy(formField.sortOrder);
+
+      // 4. Form Responses (Pivot)
+      const submissions = await db
+        .select({
+          id: formSubmission.id,
+          submittedAt: formSubmission.submittedAt,
+        })
+        .from(formSubmission)
+        .where(eq(formSubmission.formId, formId))
+        .orderBy(desc(formSubmission.submittedAt));
+
+      const responsesData: Record<string, any>[] = [];
+
+      if (submissions.length > 0) {
+        const submissionIds = submissions.map((s) => s.id);
+        const responses = await db
+          .select({
+            submissionId: formResponse.submissionId,
+            fieldId: formResponse.fieldId,
+            value: formResponse.value,
+          })
+          .from(formResponse)
+          .where(inArray(formResponse.submissionId, submissionIds));
+
+        // Group responses by submission
+        const responsesBySubmission = responses.reduce(
+          (acc, curr) => {
+            if (!acc[curr.submissionId]) {
+              acc[curr.submissionId] = {};
+            }
+            acc[curr.submissionId]![curr.fieldId] = curr.value;
+            return acc;
+          },
+          {} as Record<string, Record<string, any>>,
+        );
+
+        for (const sub of submissions) {
+          const row: Record<string, any> = {
+            id: sub.id,
+            submittedAt: sub.submittedAt?.toISOString(),
+          };
+
+          const subResponses = responsesBySubmission[sub.id] || {};
+
+          // Map field IDs to field keys
+          for (const field of formFields) {
+            row[field.key] = subResponses[field.id] ?? null;
+          }
+
+          responsesData.push(row);
+        }
+      }
+
+      const result = {
+        heatmap,
+        trend,
+        fields: formFields,
+        responses: responsesData,
+      };
+
+      const parsed = individualFormAnalyticsOutputSchema.safeParse(result);
       if (!parsed.success) {
         throw parsed.error;
       }

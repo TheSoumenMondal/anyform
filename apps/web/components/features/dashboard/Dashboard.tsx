@@ -11,10 +11,8 @@ export const Dashboard = () => {
 
   if (analyticsIsLoading || !analyticsData) {
     return (
-      <div className="w-full h-full flex items-center justify-center min-h-100">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary">
-          No data available
-        </div>
+      <div className="w-full h-[calc(100vh-100px)] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
   }

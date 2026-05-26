@@ -37,7 +37,7 @@ const Navbar = () => {
   const segments = pathname.split("/").filter(Boolean);
 
   const isFormListRoute = pathname === "/form" || pathname === "/dashboard";
-  const isFormDetailRoute = pathname.startsWith("/form/") && segments.length >= 2;
+  const isFormDetailRoute = pathname.startsWith("/form/") && segments.length === 2;
   const formSlug = isFormDetailRoute ? segments[1] : null;
 
   return (

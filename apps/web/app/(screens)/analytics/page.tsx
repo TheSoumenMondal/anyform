@@ -25,16 +25,7 @@ const AnalyticsPage = () => {
 
   return (
     <div className="w-full h-full flex flex-col p-4 md:p-6 lg:p-8 overflow-y-auto bg-background/50">
-      <div className="max-w-6xl w-full mx-auto space-y-6">
-        <div>
-          <h1 className="text-3xl font-instrumental-serif tracking-wide text-foreground">
-            Analytics
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Track your form responses and conversion rates.
-          </p>
-        </div>
-
+      <div className="w-full mx-auto space-y-6">
         {/* Top Area Chart for 365 Days Responses */}
         <AreaAnalyticsCard data={daily_activity} />
 

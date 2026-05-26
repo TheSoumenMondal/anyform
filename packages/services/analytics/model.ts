@@ -4,7 +4,13 @@ export const getAnalyticsInput = z.object({
   userId: z.string(),
 });
 
+export const getIndividualFormAnalyticsInput = z.object({
+  userId: z.string(),
+  slug: z.string(),
+});
+
 export type GetAnalyticsInputType = z.infer<typeof getAnalyticsInput>;
+export type GetIndividualFormAnalyticsInputType = z.infer<typeof getIndividualFormAnalyticsInput>;
 
 const monthlyActivityItemSchema = z.object({
   month: z.string(),
@@ -23,6 +29,7 @@ const formRecordSchema = z.object({
   completion_rate: z.coerce.number().nullable(),
   last_response: z.string().nullable(),
   form_id: z.string().uuid(),
+  slug: z.string(),
   trend: z.array(trendItemSchema).optional(),
 });
 
@@ -55,3 +62,24 @@ export const yearlyDailyAnalyticsOutputSchema = z.object({
 });
 
 export type YearlyDailyAnalyticsOutput = z.infer<typeof yearlyDailyAnalyticsOutputSchema>;
+
+const heatmapItemSchema = z.object({
+  hour: z.coerce.number().int().min(0).max(23),
+  dayOfWeek: z.coerce.number().int().min(0).max(6),
+  count: z.coerce.number().int().nonnegative(),
+});
+
+const fieldSchema = z.object({
+  id: z.string().uuid(),
+  label: z.string(),
+  key: z.string(),
+});
+
+export const individualFormAnalyticsOutputSchema = z.object({
+  heatmap: z.array(heatmapItemSchema),
+  trend: z.array(trendItemSchema),
+  fields: z.array(fieldSchema),
+  responses: z.array(z.record(z.string(), z.any())),
+});
+
+export type IndividualFormAnalyticsOutput = z.infer<typeof individualFormAnalyticsOutputSchema>;

@@ -9,6 +9,7 @@ import { DataTableColumnHeader } from "~/components/data-table/data-table-column
 import { DataTableToolbar } from "~/components/data-table/data-table-toolbar";
 import { useDataTable } from "~/hooks/use-data-table";
 import { Button } from "~/components/ui/button";
+import Link from "next/link";
 
 import { cn } from "~/lib/utils";
 import LineChart, { Line } from "~/components/charts/line-chart";
@@ -21,6 +22,7 @@ import { BadgeAdditional } from "~/components/ui/badge-1";
 
 interface FormRow {
   id: string;
+  slug: string;
   title: string;
   status: "draft" | "published";
   submissions: number;
@@ -70,6 +72,7 @@ interface FormRecordsProps {
     completion_rate: number | null;
     last_response: string | null;
     form_id: string;
+    slug: string;
     trend?: { date: string; value: number }[];
   }[];
 }
@@ -87,6 +90,7 @@ export function FormRecords({ data }: FormRecordsProps) {
 
       return {
         id: item.form_id,
+        slug: item.slug,
         title: item.title,
         status: item.status === "published" ? "published" : "draft",
         submissions: item.submissions,
@@ -274,11 +278,13 @@ export function FormRecords({ data }: FormRecordsProps) {
         cell: ({ row }) => {
           return (
             <div className="flex justify-center w-full">
-              <Button variant="info" size="sm" className="gap-2">
-                <BarChart3 className="size-4" />
-                Analytics
-                <span className="sr-only">{row.original.title}</span>
-              </Button>
+              <Link href={`/analytics/${row.original.slug}`}>
+                <Button variant="info" size="sm" className="gap-2">
+                  <BarChart3 className="size-4" />
+                  Analytics
+                  <span className="sr-only">{row.original.title}</span>
+                </Button>
+              </Link>
             </div>
           );
         },

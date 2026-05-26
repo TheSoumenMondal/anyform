@@ -24,7 +24,7 @@ const AreaAnalyticsCard = ({ data }: AreaAnalyticsCardProps) => {
       <p className="text-2xl font-instrumental-serif px-6 py-4 border-b border-border/50 bg-accent text-foreground">
         Your past 1 year activity
       </p>
-      <div className="bg-card">
+      <div className="bg-card p-6">
         <AreaChart
           className="w-full h-72 mx-0"
           data={chartData}
