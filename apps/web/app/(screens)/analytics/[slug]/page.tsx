@@ -12,6 +12,7 @@ import { useDataTable } from "~/hooks/use-data-table";
 import { DataTable } from "~/components/data-table/data-table";
 import { DataTableColumnHeader } from "~/components/data-table/data-table-column-header";
 import { ColumnDef } from "@tanstack/react-table";
+import { Badge } from "~/components/ui/badge";
 
 export default function IndividualFormAnalyticsPage() {
   const params = useParams();
@@ -25,6 +26,19 @@ export default function IndividualFormAnalyticsPage() {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const baseColumns: ColumnDef<Record<string, any>>[] = [
+      {
+        id: "status",
+        accessorKey: "status",
+        header: ({ column }) => <DataTableColumnHeader column={column} label="Status" />,
+        cell: ({ cell }) => {
+          const val = cell.getValue<string>();
+          return (
+            <Badge variant={val === "submitted" ? "default" : "secondary"}>
+              {val === "submitted" ? "Submitted" : "Draft"}
+            </Badge>
+          );
+        },
+      },
       {
         id: "submittedAt",
         accessorKey: "submittedAt",
@@ -89,7 +103,7 @@ export default function IndividualFormAnalyticsPage() {
   }));
 
   return (
-    <div className="w-full h-full flex flex-col p-4 md:p-6 lg:p-8 overflow-y-auto bg-background/50">
+    <div className="flex flex-col p-4 md:p-6 lg:p-8 bg-background/50 min-w-0">
       <div className="w-full mx-auto space-y-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Heatmap Card */}

@@ -11,7 +11,6 @@ import {
 class FormFieldService {
   private createFormFieldLevelKey(label: string): string {
     const base = slugify(label, { lower: true, strict: true, remove: /[*+~.()'"!:@]/g });
-    // Append a random suffix so duplicate field types within the same form don't collide
     const suffix = Math.random().toString(36).slice(2, 8);
     return `${base}-${suffix}`;
   }
@@ -30,6 +29,22 @@ class FormFieldService {
 
   public async getFormFieldsByFormId(formId: string, userId: string) {
     await this.checkIfUserOwnsFormField(formId, userId);
+
+    const result = await db
+      .select()
+      .from(formField)
+      .where(eq(formField.formId, formId))
+      .orderBy(asc(formField.sortOrder));
+
+    return result;
+  }
+
+  public async getPublicFormFieldsByFormId(formId: string) {
+    // Check if the form is published before returning fields
+    const formResult = await db.select().from(form).where(eq(form.id, formId)).limit(1);
+    if (formResult.length === 0 || formResult[0]?.formStatus !== "published") {
+      throw new Error("Form not found or is not published");
+    }
 
     const result = await db
       .select()

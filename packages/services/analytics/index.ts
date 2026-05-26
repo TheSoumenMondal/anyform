@@ -57,16 +57,16 @@ class AnalyticsService {
         daily_series AS (
           SELECT day_start
           FROM generate_series(
-            date_trunc('day', now() - interval '13 days'),
-            date_trunc('day', now()),
+            date_trunc('day', (now() at time zone 'UTC') - interval '13 days'),
+            date_trunc('day', (now() at time zone 'UTC')),
             interval '1 day'
           ) AS day_start
         ),
         monthly_series AS (
           SELECT month_start
           FROM generate_series(
-            date_trunc('month', now() - interval '11 months'),
-            date_trunc('month', now()),
+            date_trunc('month', (now() at time zone 'UTC') - interval '11 months'),
+            date_trunc('month', (now() at time zone 'UTC')),
             interval '1 month'
           ) AS month_start
         ),
@@ -76,7 +76,7 @@ class AnalyticsService {
             COUNT(*) AS submission_count
           FROM ${formSubmission} fs
           WHERE fs.status = 'submitted'
-            AND fs.submitted_at >= date_trunc('month', now() - interval '11 months')
+            AND fs.submitted_at >= date_trunc('month', (now() at time zone 'UTC') - interval '11 months')
             AND fs.form_id IN (SELECT id FROM active_forms_def)
           GROUP BY date_trunc('month', fs.submitted_at)
         ),
@@ -86,7 +86,7 @@ class AnalyticsService {
             COUNT(*) AS count
           FROM ${formSubmission} fs
           WHERE fs.status = 'submitted'
-            AND fs.submitted_at >= date_trunc('day', now() - interval '13 days')
+            AND fs.submitted_at >= date_trunc('day', (now() at time zone 'UTC') - interval '13 days')
             AND fs.form_id IN (SELECT id FROM active_forms_def)
           GROUP BY date_trunc('day', fs.submitted_at)
         ),
@@ -96,7 +96,7 @@ class AnalyticsService {
             COUNT(*) AS count
           FROM ${formSubmission} fs
           WHERE fs.status = 'draft'
-            AND fs.created_at >= date_trunc('day', now() - interval '13 days')
+            AND fs.created_at >= date_trunc('day', (now() at time zone 'UTC') - interval '13 days')
             AND fs.form_id IN (SELECT id FROM active_forms_def)
           GROUP BY date_trunc('day', fs.created_at)
         ),
@@ -106,7 +106,7 @@ class AnalyticsService {
             COUNT(*) FILTER (WHERE status = 'submitted') AS submitted,
             COUNT(*) AS total
           FROM ${formSubmission} fs
-          WHERE fs.created_at >= date_trunc('day', now() - interval '13 days')
+          WHERE fs.created_at >= date_trunc('day', (now() at time zone 'UTC') - interval '13 days')
             AND fs.form_id IN (SELECT id FROM active_forms_def)
           GROUP BY date_trunc('day', fs.created_at)
         ),
@@ -195,12 +195,7 @@ class AnalyticsService {
                 'status', fc.form_status,
                 'submissions', fc.submitted_count,
                 'completion_rate', ROUND(fc.completion_rate::numeric, 1),
-                'last_response', 
-                  CASE 
-                    WHEN fc.last_submitted_at IS NOT NULL 
-                    THEN to_char(fc.last_submitted_at at time zone 'UTC', 'YYYY-MM-DD HH24:MI:SS')
-                    ELSE NULL
-                  END,
+                'last_response', fc.last_submitted_at,
                 'form_id', fc.id,
                 'slug', fc.slug,
                 'trend', (
@@ -256,8 +251,8 @@ class AnalyticsService {
         yearly_daily_series AS (
           SELECT day_start
           FROM generate_series(
-            date_trunc('day', now() - interval '364 days'),
-            date_trunc('day', now()),
+            date_trunc('day', (now() at time zone 'UTC') - interval '364 days'),
+            date_trunc('day', (now() at time zone 'UTC')),
             interval '1 day'
           ) AS day_start
         ),
@@ -273,7 +268,7 @@ class AnalyticsService {
             COUNT(*) AS submission_count
           FROM ${formSubmission} fs
           WHERE fs.status = 'submitted'
-            AND fs.submitted_at >= date_trunc('day', now() - interval '364 days')
+            AND fs.submitted_at >= date_trunc('day', (now() at time zone 'UTC') - interval '364 days')
             AND fs.form_id IN (SELECT id FROM active_forms_def)
           GROUP BY date_trunc('day', fs.submitted_at)
         )
@@ -350,8 +345,8 @@ class AnalyticsService {
         WITH daily_series AS (
           SELECT day_start
           FROM generate_series(
-            date_trunc('day', now() - interval '29 days'),
-            date_trunc('day', now()),
+            date_trunc('day', (now() at time zone 'UTC') - interval '29 days'),
+            date_trunc('day', (now() at time zone 'UTC')),
             interval '1 day'
           ) AS day_start
         ),
@@ -361,7 +356,7 @@ class AnalyticsService {
             COUNT(*) AS count
           FROM ${formSubmission}
           WHERE form_id = ${formId} AND status = 'submitted'
-            AND submitted_at >= date_trunc('day', now() - interval '29 days')
+            AND submitted_at >= date_trunc('day', (now() at time zone 'UTC') - interval '29 days')
           GROUP BY date_trunc('day', submitted_at)
         )
         SELECT 
@@ -393,6 +388,7 @@ class AnalyticsService {
         .select({
           id: formSubmission.id,
           submittedAt: formSubmission.submittedAt,
+          status: formSubmission.status,
         })
         .from(formSubmission)
         .where(eq(formSubmission.formId, formId))
@@ -427,6 +423,7 @@ class AnalyticsService {
           const row: Record<string, any> = {
             id: sub.id,
             submittedAt: sub.submittedAt?.toISOString(),
+            status: sub.status,
           };
 
           const subResponses = responsesBySubmission[sub.id] || {};

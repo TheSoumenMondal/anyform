@@ -17,7 +17,7 @@ import {
   updateFormInput,
   UpdateFormInputType,
 } from "./model";
-import { form } from "@repo/database/schema";
+import { form, formResponse, formSubmission, formField } from "@repo/database/schema";
 import slugify from "slugify";
 import { nanoid } from "nanoid";
 
@@ -176,6 +176,51 @@ class FormService {
     return result[0]!;
   }
 
+  public async getPublicFormBySlug(slug: string) {
+    const result = await db
+      .select({
+        id: form.id,
+        slug: form.slug,
+        title: form.title,
+        description: form.description,
+        formType: form.formType,
+        formStatus: form.formStatus,
+        isPublic: form.isPublic,
+        isProtected: form.isProtected,
+        maxSubmissionLimit: form.maxSubmissionLimit,
+        expiry: form.expiry,
+        createdAt: form.createdAt,
+        updatedAt: form.updatedAt,
+      })
+      .from(form)
+      .where(and(eq(form.slug, slug), eq(form.formStatus, "published")))
+      .limit(1);
+
+    if (!result || result.length === 0) {
+      throw new Error("Form not found or is not published");
+    }
+
+    return result[0]!;
+  }
+
+  public async getFormById(formId: string) {
+    const result = await db
+      .select({
+        id: form.id,
+        isProtected: form.isProtected,
+        formStatus: form.formStatus,
+      })
+      .from(form)
+      .where(eq(form.id, formId))
+      .limit(1);
+
+    if (!result || result.length === 0) {
+      throw new Error("Form not found");
+    }
+
+    return result[0]!;
+  }
+
   public async updateForm(payload: UpdateFormInputType) {
     const {
       formId,
@@ -305,6 +350,145 @@ class FormService {
       .from(form)
       .where(and(eq(form.createdBy, userId), eq(form.formStatus, "deleted")));
     return result;
+  }
+
+  public async submitFormResponse(payload: {
+    formId: string;
+    responses: Record<string, unknown>;
+    submissionId?: string;
+  }) {
+    const { formId, responses, submissionId } = payload;
+
+    // 1. Check if form exists and is published
+    const formData = await db
+      .select({ id: form.id, formStatus: form.formStatus })
+      .from(form)
+      .where(eq(form.id, formId))
+      .limit(1);
+
+    if (formData.length === 0) throw new Error("Form not found");
+    if (formData[0]!.formStatus !== "published") throw new Error("Form is not published");
+
+    let finalSubmissionId = submissionId;
+
+    if (submissionId) {
+      // 2a. Update existing submission
+      const [updatedSubmission] = await db
+        .update(formSubmission)
+        .set({
+          status: "submitted",
+          submittedAt: new Date(),
+        })
+        .where(eq(formSubmission.id, submissionId))
+        .returning();
+
+      if (!updatedSubmission) {
+        // If not found, create new one as fallback
+        const [newSubmission] = await db
+          .insert(formSubmission)
+          .values({
+            formId,
+            status: "submitted",
+            submittedAt: new Date(),
+          })
+          .returning();
+        finalSubmissionId = newSubmission?.id;
+      }
+    } else {
+      // 2b. Create new submission
+      const [submission] = await db
+        .insert(formSubmission)
+        .values({
+          formId,
+          status: "submitted",
+          submittedAt: new Date(),
+        })
+        .returning();
+      finalSubmissionId = submission?.id;
+    }
+
+    if (!finalSubmissionId) throw new Error("Failed to handle submission");
+
+    // 3. Get all fields for this form to map labelKey to fieldId
+    const fields = await db
+      .select({ id: formField.id, labelKey: formField.labelKey })
+      .from(formField)
+      .where(eq(formField.formId, formId));
+
+    const fieldMap = new Map(fields.map((f) => [f.labelKey, f.id]));
+
+    // 4. Create responses
+    const responseValues = Object.entries(responses)
+      .map(([labelKey, value]) => {
+        const fieldId = fieldMap.get(labelKey);
+        if (!fieldId) return null;
+        return {
+          submissionId: finalSubmissionId,
+          fieldId,
+          value,
+        };
+      })
+      .filter((r): r is NonNullable<typeof r> => r !== null);
+
+    if (responseValues.length > 0) {
+      await db.insert(formResponse).values(responseValues);
+    }
+
+    return { success: true, submissionId: finalSubmissionId };
+  }
+
+  public async createDraftSubmission(payload: { formId: string }) {
+    const { formId } = payload;
+
+    // 1. Check if form exists and is published
+    const formData = await db
+      .select({ id: form.id, formStatus: form.formStatus })
+      .from(form)
+      .where(eq(form.id, formId))
+      .limit(1);
+
+    if (formData.length === 0) throw new Error("Form not found");
+    if (formData[0]!.formStatus !== "published") throw new Error("Form is not published");
+
+    // 2. Create draft submission
+    const [submission] = await db
+      .insert(formSubmission)
+      .values({
+        formId,
+        status: "draft",
+      })
+      .returning();
+
+    if (!submission) throw new Error("Failed to create draft submission");
+
+    return { submissionId: submission.id };
+  }
+
+  public async verifyFormPassword(payload: { formId: string; password: string }) {
+    const { formId, password } = payload;
+
+    const formData = await db
+      .select({ id: form.id, isProtected: form.isProtected, password: form.password })
+      .from(form)
+      .where(eq(form.id, formId))
+      .limit(1);
+
+    if (formData.length === 0) {
+      throw new Error("Form not found");
+    }
+
+    const existingForm = formData[0]!;
+
+    if (!existingForm.isProtected) {
+      // If form is not protected, consider it successfully verified implicitly
+      return { success: true };
+    }
+
+    if (existingForm.password !== password) {
+      throw new Error("Incorrect password");
+    }
+
+    return { success: true };
   }
 }
 

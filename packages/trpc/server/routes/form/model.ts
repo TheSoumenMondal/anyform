@@ -224,6 +224,34 @@ export const deleteFormFieldOutputType = z.object({
   success: z.boolean().describe("Whether the form field was successfully deleted"),
 });
 
+export const submitFormResponseInputModel = z.object({
+  formId: z.uuid().describe("ID of the form"),
+  responses: z.record(z.string(), z.unknown()).describe("Map of field label keys to values"),
+  submissionId: z.uuid().optional().describe("Optional ID of an existing draft submission"),
+});
+
+export const createDraftSubmissionInputModel = z.object({
+  formId: z.string().uuid().describe("ID of the form"),
+});
+
+export const createDraftSubmissionOutputModel = z.object({
+  submissionId: z.string().uuid().describe("ID of the created draft submission"),
+});
+
+export const submitFormResponseOutputModel = z.object({
+  success: z.boolean().describe("Whether the submission was successful"),
+  submissionId: z.string().uuid().describe("ID of the created submission"),
+});
+
+export const verifyFormPasswordInputModel = z.object({
+  formId: z.string().uuid().describe("ID of the form"),
+  password: z.string().describe("Password for the form"),
+});
+
+export const verifyFormPasswordOutputModel = z.object({
+  success: z.boolean().describe("Whether the password was correct"),
+});
+
 export const getDeletedFromsByUserIdOutputModel = z.array(
   z.object({
     id: z.string().describe("ID of the form"),

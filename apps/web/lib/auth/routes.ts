@@ -1,4 +1,4 @@
-export const PUBLIC_PATHS = ["/", "/login", "/signup"] as const;
+export const PUBLIC_PATHS = ["/", "/login", "/signup", "/submit"] as const;
 
 export const AUTH_PATHS = ["/login", "/signup"] as const;
 

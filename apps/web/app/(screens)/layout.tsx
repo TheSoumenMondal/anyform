@@ -18,7 +18,7 @@ const Layout = ({ children }: Props) => {
   return (
     <SidebarProvider defaultOpen={!isFormDetailRoute}>
       <AppSidebar />
-      <main className="flex w-full flex-col max-h-screen pl-0">
+      <main className="flex flex-1 flex-col max-h-screen pl-0 min-w-0">
         <Navbar />
         <div className="flex-1 overflow-y-auto p-2">{children}</div>
       </main>

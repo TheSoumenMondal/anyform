@@ -1,6 +1,7 @@
+import { TRPCError } from "@trpc/server";
 import { zodUndefinedModel } from "../../schema";
 import { formFieldService, formService } from "../../services";
-import { protectedProcedure, router } from "../../trpc";
+import { protectedProcedure, publicProcedure, router } from "../../trpc";
 import z from "zod";
 import {
   archiveFormInputModel,
@@ -24,10 +25,16 @@ import {
   publishFormOutputModel,
   recoverFormInputModel,
   recoverFormOutputModel,
+  submitFormResponseInputModel,
+  submitFormResponseOutputModel,
+  createDraftSubmissionInputModel,
+  createDraftSubmissionOutputModel,
   updateFormFieldInputModel,
   updateFormFieldOutputModel,
   updateFormInputModel,
   updateFormOutputType,
+  verifyFormPasswordInputModel,
+  verifyFormPasswordOutputModel,
 } from "./model";
 
 const formTags = ["Form"];
@@ -471,6 +478,173 @@ export const formRouter = router({
     .query(async ({ ctx }) => {
       const userId = ctx.user.id;
       const result = await formService.getDeletedForms({ userId });
+
+      return result;
+    }),
+
+  getPublicFormBySlug: publicProcedure
+    .meta({
+      openapi: {
+        method: "GET",
+        path: "/getPublicFormBySlug",
+        tags: formTags,
+      },
+    })
+    .input(z.object({ slug: z.string() }))
+    .output(getFormBySlugOutputModel)
+    .query(async ({ input }) => {
+      const { slug } = input;
+      const result = await formService.getPublicFormBySlug(slug);
+      return result;
+    }),
+
+  getPublicFormFieldsByFormId: publicProcedure
+    .meta({
+      openapi: {
+        method: "GET",
+        path: "/getPublicFormFieldsByFormId",
+        tags: formTags,
+      },
+    })
+    .input(z.object({ formId: z.string() }))
+    .output(getFormFieldsByFormIdOutputModel)
+    .query(async ({ input, ctx }) => {
+      const { formId } = input;
+
+      const formDetails = await formService.getFormById(formId);
+
+      if (formDetails.isProtected) {
+        const isVerified = ctx.getCookie(`af_pwd_${formId}`);
+        if (!isVerified) {
+          throw new TRPCError({
+            code: "UNAUTHORIZED",
+            message: "This form is protected. Please provide a password.",
+          });
+        }
+      }
+
+      const formFieldDetails = await formFieldService.getPublicFormFieldsByFormId(formId);
+
+      return formFieldDetails.map((field) => ({
+        ...field,
+        index: field.index,
+        stepNumber: field.stepNumber ?? null,
+        dependsOnFieldId: field.dependsOnFieldId ?? null,
+      }));
+    }),
+
+  submitFormResponse: publicProcedure
+    .meta({
+      openapi: {
+        method: "POST",
+        path: "/submitFormResponse",
+        tags: formTags,
+      },
+    })
+    .input(submitFormResponseInputModel)
+    .output(submitFormResponseOutputModel)
+    .mutation(async ({ input, ctx }) => {
+      const { formId, responses } = input;
+      let { submissionId } = input;
+
+      const formDetails = await formService.getFormById(formId);
+      if (formDetails.isProtected) {
+        const isVerified = ctx.getCookie(`af_pwd_${formId}`);
+        if (!isVerified) {
+          throw new TRPCError({
+            code: "UNAUTHORIZED",
+            message: "This form is protected. Please provide a password.",
+          });
+        }
+      }
+
+      // Fallback to cookie if submissionId is not in the request body
+      if (!submissionId) {
+        submissionId = ctx.getCookie(`af_sub_${formId}`);
+      }
+
+      const result = await formService.submitFormResponse({ formId, responses, submissionId });
+
+      // Clear submission cookie on success
+      if (result.success) {
+        ctx.clearCookie(`af_sub_${formId}`);
+      }
+
+      return result;
+    }),
+
+  createDraftSubmission: publicProcedure
+    .meta({
+      openapi: {
+        method: "POST",
+        path: "/createDraftSubmission",
+        tags: formTags,
+      },
+    })
+    .input(createDraftSubmissionInputModel)
+    .output(createDraftSubmissionOutputModel)
+    .mutation(async ({ input, ctx }) => {
+      const { formId } = input;
+      const cookieName = `af_sub_${formId}`;
+
+      const formDetails = await formService.getFormById(formId);
+      if (formDetails.isProtected) {
+        const isVerified = ctx.getCookie(`af_pwd_${formId}`);
+        if (!isVerified) {
+          throw new TRPCError({
+            code: "UNAUTHORIZED",
+            message: "This form is protected. Please provide a password.",
+          });
+        }
+      }
+
+      // Check for existing submission token in cookie
+      const existingSubmissionId = ctx.getCookie(cookieName);
+
+      if (existingSubmissionId) {
+        // Return existing submission ID
+        return { submissionId: existingSubmissionId };
+      }
+
+      // Create new draft submission
+      const result = await formService.createDraftSubmission({ formId });
+
+      // Store new submission ID in secure HttpOnly cookie
+      ctx.createCookie(cookieName, result.submissionId, {
+        path: "/",
+        httpOnly: true,
+        secure: process.env.NODE_ENV !== "development",
+        sameSite: "strict",
+        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+      });
+
+      return result;
+    }),
+
+  verifyFormPassword: publicProcedure
+    .meta({
+      openapi: {
+        method: "POST",
+        path: "/verifyFormPassword",
+        tags: formTags,
+      },
+    })
+    .input(verifyFormPasswordInputModel)
+    .output(verifyFormPasswordOutputModel)
+    .mutation(async ({ input, ctx }) => {
+      const { formId, password } = input;
+
+      const result = await formService.verifyFormPassword({ formId, password });
+
+      if (result.success) {
+        ctx.createCookie(`af_pwd_${formId}`, "true", {
+          path: "/",
+          httpOnly: true,
+          secure: process.env.NODE_ENV !== "development",
+          sameSite: "strict",
+          maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+        });
+      }
 
       return result;
     }),

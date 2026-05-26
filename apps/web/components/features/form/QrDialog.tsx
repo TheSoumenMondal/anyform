@@ -29,12 +29,12 @@ const getQrFileName = (formTitle: string) =>
   }-qr`;
 
 type QrDialogProps = {
-  formId: string;
   formTitle: string;
+  formSlug: string;
   trigger?: React.ReactElement;
 };
 
-const QrDialog = ({ formId, formTitle, trigger }: QrDialogProps) => {
+const QrDialog = ({ formTitle, formSlug, trigger }: QrDialogProps) => {
   const { resolvedTheme } = useTheme();
 
   const currentQrOptions = React.useMemo<SnapQROptions>(() => {
@@ -69,7 +69,7 @@ const QrDialog = ({ formId, formTitle, trigger }: QrDialogProps) => {
     };
   }, [resolvedTheme]);
 
-  const formPath = `/fill/${formId}`;
+  const formPath = `/submit/${formSlug}`;
   const [formUrl, setFormUrl] = React.useState(formPath);
   const [isCopied, setIsCopied] = React.useState(false);
   const [imgSrc, setImgSrc] = React.useState<string | null>(null);

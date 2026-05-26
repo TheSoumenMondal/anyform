@@ -75,8 +75,8 @@ export const FormCard = ({ form }: FormCardProps) => {
                   }
                 />
                 <QrDialog
-                  formId={form.id}
                   formTitle={form.title}
+                  formSlug={form.slug}
                   trigger={
                     <DropdownMenuItem className="w-full" onSelect={(e) => e.preventDefault()}>
                       <HugeiconsIcon icon={QrCodeIcon} className="size-3.5" />
@@ -108,7 +108,7 @@ export const FormCard = ({ form }: FormCardProps) => {
             <div className="flex items-center gap-0.5">
               <DeleteFormDialog formId={form.id} formTitle={form.title} />
               <EditFormSheet form={form} />
-              <QrDialog formId={form.id} formTitle={form.title} />
+              <QrDialog formTitle={form.title} formSlug={form.slug} />
               <Button variant="warning" onClick={handleAddFormFields}>
                 <HugeiconsIcon icon={Add} />
                 Add form fields
