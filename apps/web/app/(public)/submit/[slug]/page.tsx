@@ -1,5 +1,5 @@
 import React from "react";
-import OsTheme from "~/components/themes/os/OsTheme";
+import MovieTheme from "~/components/themes/movie/MovieTheme";
 
 type Props = {
   params: Promise<{
@@ -11,7 +11,7 @@ const page = async ({ params }: Props) => {
   const { slug } = await params;
   return (
     <div className="w-full h-screen">
-      <OsTheme slug={slug} />
+      <MovieTheme slug={slug} />
     </div>
   );
 };
