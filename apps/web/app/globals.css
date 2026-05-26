@@ -173,17 +173,67 @@
   display: none;             /* Chrome / Safari / Opera */
 }
 
-@keyframes field-enter {
-  from {
-    opacity: 0;
-    transform: translateY(-8px) scale(0.96);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+
+
+/* ── ReactFlow dark-mode overrides ───────────────────────────────────────── */
+
+/* Light mode */
+:root {
+  --xy-background-color-default: var(--background);
+  --xy-node-background-color-default: var(--card);
+  --xy-node-border-default: 1px solid var(--border);
+  --xy-node-boxshadow-default: 0 4px 12px rgba(0, 0, 0, 0.06);
+  --xy-handle-background-color-default: var(--foreground);
+  --xy-handle-border-color-default: var(--background);
+  --xy-edge-stroke-default: var(--muted-foreground);
+  --xy-edge-stroke-width-default: 1.5;
+  --xy-attribution-background-color-default: transparent;
+  --xy-minimap-background-color-default: var(--background);
+  --xy-controls-button-background-color-default: var(--background);
+  --xy-controls-button-border-color-default: var(--border);
+  --xy-controls-button-color-default: var(--foreground);
 }
 
-.animate-field-enter {
-  animation: field-enter 200ms cubic-bezier(0.22, 1, 0.36, 1) both;
+/* Dark mode */
+.dark {
+  --xy-background-color-default: var(--background);
+  --xy-node-background-color-default: var(--card);
+  --xy-node-border-default: 1px solid var(--border);
+  --xy-node-boxshadow-default: 0 4px 24px rgba(0, 0, 0, 0.4);
+  --xy-handle-background-color-default: var(--foreground);
+  --xy-handle-border-color-default: var(--background);
+  --xy-edge-stroke-default: var(--muted-foreground);
+  --xy-minimap-background-color-default: var(--background);
+  
+  --xy-controls-button-background-color: var(--card);
+  --xy-controls-button-background-color-default: var(--card);
+  --xy-controls-button-border-color: var(--border);
+  --xy-controls-button-border-color-default: var(--border);
+  --xy-controls-button-color: var(--foreground);
+  --xy-controls-button-color-default: var(--foreground);
+  --xy-controls-button-background-color-hover: var(--accent);
+  --xy-controls-button-background-color-hover-default: var(--accent);
 }
+
+.dark .react-flow__controls-button {
+  background-color: var(--card) !important;
+  fill: var(--foreground) !important;
+  border-bottom-color: var(--border) !important;
+}
+.dark .react-flow__controls-button:hover {
+  background-color: var(--accent) !important;
+}
+.react-flow__controls {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+}
+
+/* Hide the default ReactFlow edge label if any */
+.react-flow__edge-textbg {
+  display: none;
+}
+
+/* Edge reconnect handle styling */
+.react-flow__edgeupdater {
+  cursor: crosshair;
+}
+

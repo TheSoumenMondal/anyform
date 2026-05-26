@@ -250,10 +250,9 @@ export function Area({
           <ChartRevealClip
             clipPathId={revealClipId}
             enterTransition={enterTransition}
-            height={innerHeight}
+            height={innerHeight + 20}
             revealEpoch={revealEpoch ?? 0}
             targetWidth={innerWidth}
-            padding={20}
           />
         </defs>
       ) : null}

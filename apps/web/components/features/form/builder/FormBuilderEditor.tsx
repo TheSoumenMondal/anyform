@@ -21,6 +21,47 @@ type FormDetails = {
   formStatus: "draft" | "published" | "archived" | "deleted";
 };
 
+export type ValidationRules = {
+  // Text fields
+  minLength?: number;
+  maxLength?: number;
+  pattern?: string;
+  trimWhitespace?: boolean;
+  // Email
+  allowedDomains?: string[]; // e.g. ["gmail.com", "company.com"]
+  // Phone
+  phoneFormat?: "international" | "local" | "any";
+  // URL
+  allowedProtocols?: string[]; // e.g. ["https"]
+  // Number / Slider
+  min?: number;
+  max?: number;
+  step?: number;
+  integerOnly?: boolean;
+  // Rating
+  minRating?: number;
+  maxRating?: number; // also used as max stars displayed
+  // Multi-choice
+  minSelections?: number;
+  maxSelections?: number;
+  // Date
+  minDate?: string;
+  maxDate?: string;
+  disablePastDates?: boolean;
+  disableFutureDates?: boolean;
+  disableWeekends?: boolean;
+  // File
+  maxFileSize?: number; // in MB
+  allowedFileTypes?: string[];
+  maxFiles?: number;
+  allowMultipleFiles?: boolean;
+};
+
+export type FieldOption = {
+  label: string;
+  value: string;
+};
+
 export type CanvasField = {
   id: string;
   formId: string;
@@ -33,6 +74,11 @@ export type CanvasField = {
   isHidden: boolean;
   isDisabled: boolean;
   sortOrder: number;
+  defaultValue?: unknown;
+  options?: FieldOption[] | null;
+  validation?: ValidationRules | null;
+  settings?: Record<string, unknown> | null;
+  stepNumber?: number | null;
 };
 
 type FormBuilderEditorProps = {
@@ -55,7 +101,9 @@ export const FormBuilderEditor = ({ slug, form: formProp }: FormBuilderEditorPro
 
   useEffect(() => {
     if (formFields) {
-      setFields([...formFields].sort((a, b) => a.sortOrder - b.sortOrder));
+      setFields(
+        [...formFields].sort((a, b) => a.sortOrder - b.sortOrder) as unknown as CanvasField[],
+      );
     }
   }, [formFields]);
 

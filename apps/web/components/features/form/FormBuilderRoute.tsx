@@ -46,5 +46,5 @@ export const FormBuilderRoute = ({ slug }: FormBuilderRouteProps) => {
     return <FormBuilderEditor slug={slug} form={form} />;
   }
 
-  return <FormBuilder />;
+  return <FormBuilder slug={slug} form={form} />;
 };
