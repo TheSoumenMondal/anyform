@@ -12,6 +12,10 @@ export const createFormInput = z.object({
     .enum(["single_step", "multi_step"])
     .default("single_step")
     .describe("Type of the form"),
+  theme: z
+    .enum(["default", "movie", "terminal", "startup", "game", "anime", "os"])
+    .default("default")
+    .describe("Theme of the form"),
   isPublic: z.boolean().default(false).describe("Whether the form is public"),
   isProtected: z.boolean().default(false).describe("Whether the form is password protected"),
   password: z.string().max(255).describe("Password for protected form").optional(),
@@ -45,6 +49,10 @@ export const updateFormInput = z.object({
   title: z.string().min(3).max(255).describe("Title of the form").optional(),
   description: z.string().max(1000).describe("Description of the form").optional(),
   formType: z.enum(["single_step", "multi_step"]).describe("Type of the form").optional(),
+  theme: z
+    .enum(["default", "movie", "terminal", "startup", "game", "anime", "os"])
+    .describe("Theme of the form")
+    .optional(),
   isPublic: z.boolean().describe("Whether the form is public").optional(),
   isProtected: z.boolean().describe("Whether the form is password protected").optional(),
   password: z.string().max(255).describe("Password for protected form").optional(),

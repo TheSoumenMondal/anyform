@@ -42,7 +42,7 @@ const AnalyticsCard = ({ title, subTitle, value, icon: Icon, trendData }: Analyt
         <div className="flex flex-col">
           <p className="text-2xl font-mono font-bold">{value}</p>
           <p className="text-xs text-muted-foreground mb-4">{subTitle}</p>
-          <div className="h-auto w-full -ml-1">
+          <div className="h-16 w-full -ml-1 mt-auto">
             <AreaChart
               data={trendData}
               margin={{ top: 5, right: 5, bottom: 5, left: 5 }}

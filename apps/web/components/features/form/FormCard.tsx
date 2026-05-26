@@ -4,31 +4,35 @@ import Link from "next/link";
 import { format } from "date-fns";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
-  Add,
   Globe02Icon,
   Key01Icon,
   LockPasswordIcon,
   Megaphone02Icon,
   PencilIcon,
   QrCodeIcon,
+  Share05Icon,
   Trash2,
   UserStatusIcon,
 } from "@hugeicons/core-free-icons";
 import { type RouterOutputs } from "@repo/trpc/client";
+import { toast } from "sonner";
 
 import QrDialog from "./QrDialog";
 import { EditFormSheet } from "./EditFormSheet";
 import { DeleteFormDialog } from "./DeleteFormDialog";
 import { Button } from "~/components/ui/button";
+import { useShareAsTemplate } from "~/hooks/api/template/use-share-as-template";
+import { useUnshareTemplate } from "~/hooks/api/template/use-unshare-template";
+import { useMyTemplates } from "~/hooks/api/template/use-templates";
 
 import { MoreHorizontal } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
-import { useSidebar } from "~/components/ui/sidebar";
 import { useRouter } from "next/navigation";
 
 type UserForm = RouterOutputs["form"]["getFormsByUserId"][number];
@@ -43,10 +47,54 @@ const formatFormType = (formType: UserForm["formType"]) =>
   formType === "single_step" ? "Single step" : "Multi step";
 
 export const FormCard = ({ form }: FormCardProps) => {
-  const { isMobile } = useSidebar();
   const router = useRouter();
+  const { shareAsTemplate, shareAsTemplateIsPending } = useShareAsTemplate();
+  const { unshareTemplate, unshareTemplateIsPending } = useUnshareTemplate();
+  const { myTemplates } = useMyTemplates();
+
   const handleAddFormFields = () => {
     router.push(`/form/${form.slug}`);
+  };
+
+  // check if this form is already shared as a template
+  const existingTemplate = myTemplates.find((t) => t.formId === form.id);
+  const isSharedAsTemplate = Boolean(existingTemplate);
+
+  const handleShareAsTemplate = () => {
+    shareAsTemplate(
+      { formId: form.id },
+      {
+        onSuccess: () => {
+          toast.success("Template shared!", {
+            description: "Your form is now available in the community templates.",
+          });
+        },
+        onError: (error) => {
+          toast.error("Failed to share template", {
+            description: error.message,
+          });
+        },
+      },
+    );
+  };
+
+  const handleUnshareTemplate = () => {
+    if (!existingTemplate) return;
+    unshareTemplate(
+      { templateId: existingTemplate.id },
+      {
+        onSuccess: () => {
+          toast.success("Template removed", {
+            description: "Your form has been removed from community templates.",
+          });
+        },
+        onError: (error) => {
+          toast.error("Failed to remove template", {
+            description: error.message,
+          });
+        },
+      },
+    );
   };
 
   return (
@@ -59,62 +107,100 @@ export const FormCard = ({ form }: FormCardProps) => {
           <p className="text-xs text-muted-foreground font-mono">{form.description}</p>
         </div>
         <div className="flex items-center gap-2">
-          {isMobile ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger>
-                <MoreHorizontal />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="bg-card mr-10 p-1.5">
-                <EditFormSheet
-                  form={form}
-                  trigger={
-                    <DropdownMenuItem className="w-full" onSelect={(e) => e.preventDefault()}>
-                      <HugeiconsIcon icon={PencilIcon} className="size-3.5" />
-                      Edit form settings
-                    </DropdownMenuItem>
-                  }
-                />
-                <QrDialog
-                  formTitle={form.title}
-                  formSlug={form.slug}
-                  trigger={
-                    <DropdownMenuItem className="w-full" onSelect={(e) => e.preventDefault()}>
-                      <HugeiconsIcon icon={QrCodeIcon} className="size-3.5" />
-                      QR Code
-                    </DropdownMenuItem>
-                  }
-                />
-                <DropdownMenuItem className="w-full" onSelect={handleAddFormFields}>
-                  <HugeiconsIcon icon={Add} className="size-3.5" />
-                  Add form fields
-                </DropdownMenuItem>
-                <DeleteFormDialog
-                  formId={form.id}
-                  formTitle={form.title}
-                  trigger={
-                    <DropdownMenuItem
-                      className="w-full"
-                      variant="destructive"
-                      onSelect={(e) => e.preventDefault()}
-                    >
-                      <HugeiconsIcon icon={Trash2} className="size-3.5" />
-                      Delete form
-                    </DropdownMenuItem>
-                  }
-                />
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            <div className="flex items-center gap-0.5">
-              <DeleteFormDialog formId={form.id} formTitle={form.title} />
-              <EditFormSheet form={form} />
-              <QrDialog formTitle={form.title} formSlug={form.slug} />
-              <Button variant="warning" onClick={handleAddFormFields}>
-                <HugeiconsIcon icon={Add} />
-                Add form fields
+          <Button variant="secondary" className="hidden sm:flex" onClick={handleAddFormFields}>
+            <HugeiconsIcon icon={PencilIcon} className="size-4" />
+            Add fields
+          </Button>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-muted-foreground hover:text-foreground"
+              >
+                <MoreHorizontal className="size-5" />
               </Button>
-            </div>
-          )}
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48 bg-card p-1.5">
+              <div className="sm:hidden">
+                <DropdownMenuItem className="w-full cursor-pointer" onSelect={handleAddFormFields}>
+                  <HugeiconsIcon icon={PencilIcon} className="size-4" />
+                  Add fields
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+              </div>
+              <EditFormSheet
+                form={form}
+                trigger={
+                  <DropdownMenuItem
+                    className="w-full cursor-pointer"
+                    onSelect={(e) => e.preventDefault()}
+                  >
+                    <HugeiconsIcon icon={PencilIcon} className="size-4" />
+                    Settings
+                  </DropdownMenuItem>
+                }
+              />
+              <QrDialog
+                formTitle={form.title}
+                formSlug={form.slug}
+                trigger={
+                  <DropdownMenuItem
+                    className="w-full cursor-pointer"
+                    onSelect={(e) => e.preventDefault()}
+                  >
+                    <HugeiconsIcon icon={QrCodeIcon} className="size-4" />
+                    Share QR
+                  </DropdownMenuItem>
+                }
+              />
+              {!form.forkedFromTemplateId && (
+                <>
+                  <DropdownMenuSeparator />
+                  {isSharedAsTemplate ? (
+                    <DropdownMenuItem
+                      className="w-full cursor-pointer"
+                      disabled={unshareTemplateIsPending}
+                      onSelect={(e) => {
+                        e.preventDefault();
+                        handleUnshareTemplate();
+                      }}
+                    >
+                      <HugeiconsIcon icon={Share05Icon} className="size-4" />
+                      Unshare template
+                    </DropdownMenuItem>
+                  ) : (
+                    <DropdownMenuItem
+                      className="w-full cursor-pointer"
+                      disabled={shareAsTemplateIsPending}
+                      onSelect={(e) => {
+                        e.preventDefault();
+                        handleShareAsTemplate();
+                      }}
+                    >
+                      <HugeiconsIcon icon={Share05Icon} className="size-4" />
+                      Publish template
+                    </DropdownMenuItem>
+                  )}
+                </>
+              )}
+              <DropdownMenuSeparator />
+              <DeleteFormDialog
+                formId={form.id}
+                formTitle={form.title}
+                trigger={
+                  <DropdownMenuItem
+                    className="w-full cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10"
+                    onSelect={(e) => e.preventDefault()}
+                  >
+                    <HugeiconsIcon icon={Trash2} className="size-4" />
+                    Delete form
+                  </DropdownMenuItem>
+                }
+              />
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
       <Link
@@ -146,6 +232,11 @@ export const FormCard = ({ form }: FormCardProps) => {
               <HugeiconsIcon icon={Megaphone02Icon} />
             )}
           </Button>
+          {isSharedAsTemplate && (
+            <Button className="border border-dashed" variant={"outline"} size="icon">
+              <HugeiconsIcon icon={Share05Icon} className="text-violet-500" />
+            </Button>
+          )}
         </div>
         <div className="hidden lg:flex flex-col">
           <p className="text-xs text-muted-foreground">Created: {formatDate(form.createdAt)}</p>

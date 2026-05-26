@@ -1,6 +1,6 @@
 import React from "react";
 
-import StartupTheme from "~/components/themes/startup/StartupTheme";
+import { ThemeRenderer } from "~/components/themes/ThemeRenderer";
 
 type Props = {
   params: Promise<{
@@ -12,7 +12,7 @@ const page = async ({ params }: Props) => {
   const { slug } = await params;
   return (
     <div className="w-full h-screen">
-      <StartupTheme slug={slug} />
+      <ThemeRenderer slug={slug} />
     </div>
   );
 };

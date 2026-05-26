@@ -9,7 +9,10 @@ import {
 } from "./model";
 import { zodUndefinedModel } from "../../schema";
 import { authService } from "../../services";
-import { setAuthenticationTokenInCookie } from "../../utils/cookie";
+import {
+  setAuthenticationTokenInCookie,
+  clearAuthenticationTokenFromCookie,
+} from "../../utils/cookie";
 
 const TAGS = ["Authentication"];
 const getPath = generatePath("/authentication");
@@ -77,5 +80,19 @@ export const authRouter = router({
         emailVerified: ctx.user.emailVerified,
         image: ctx.user.image,
       };
+    }),
+
+  signOut: publicProcedure
+    .meta({
+      openapi: {
+        method: "POST",
+        path: getPath("/signOut"),
+        tags: TAGS,
+      },
+    })
+    .output(zodUndefinedModel)
+    .mutation(async ({ ctx }) => {
+      clearAuthenticationTokenFromCookie(ctx);
+      return;
     }),
 });

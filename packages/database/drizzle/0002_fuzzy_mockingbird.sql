@@ -1,1 +1,0 @@
-ALTER TABLE "form_field" ADD COLUMN "index" numeric NOT NULL;

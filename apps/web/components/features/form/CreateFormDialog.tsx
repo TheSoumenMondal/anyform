@@ -95,6 +95,9 @@ const formSchema = z
     title: z.string().min(3, "Title must be at least 3 characters").max(255),
     description: z.string().max(DESCRIPTION_MAX_LENGTH).optional(),
     formType: z.enum(["single_step", "multi_step"]).default("single_step"),
+    theme: z
+      .enum(["default", "movie", "terminal", "startup", "game", "anime", "os"])
+      .default("default"),
     isPublic: z.boolean().default(false),
     isProtected: z.boolean().default(false),
     password: z.string().max(255).optional(),
@@ -125,6 +128,7 @@ export const CreateFormDialog = () => {
       title: "",
       description: "",
       formType: "single_step",
+      theme: "default",
       isPublic: false,
       isProtected: false,
       password: "",
@@ -141,6 +145,7 @@ export const CreateFormDialog = () => {
         title: values.title,
         description: values.description,
         formType: values.formType,
+        theme: values.theme,
         isPublic: values.isPublic,
         isProtected: values.isProtected,
         password: values.isProtected ? values.password : undefined,
@@ -271,6 +276,33 @@ export const CreateFormDialog = () => {
                         <SelectContent>
                           <SelectItem value="single_step">Single Step</SelectItem>
                           <SelectItem value="multi_step">Multi Step</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="theme"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Theme</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select theme" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="default">Default</SelectItem>
+                          <SelectItem value="movie">Movie</SelectItem>
+                          <SelectItem value="terminal">Terminal</SelectItem>
+                          <SelectItem value="startup">Startup</SelectItem>
+                          <SelectItem value="game">Game</SelectItem>
+                          <SelectItem value="anime">Anime</SelectItem>
+                          <SelectItem value="os">OS</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />

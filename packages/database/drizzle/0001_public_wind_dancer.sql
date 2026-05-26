@@ -1,0 +1,2 @@
+ALTER TABLE "form" ADD COLUMN "forked_from_template_id" uuid;--> statement-breakpoint
+ALTER TABLE "form" ADD CONSTRAINT "form_forked_from_template_id_form_template_id_fk" FOREIGN KEY ("forked_from_template_id") REFERENCES "public"."form_template"("id") ON DELETE set null ON UPDATE no action;

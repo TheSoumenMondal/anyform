@@ -20,12 +20,13 @@ import {
   AnalyticsUpIcon,
   DashboardBrowsingIcon,
   LicenseDraftIcon,
-  Settings02Icon,
   StoreAdd02Icon,
   Trash2,
 } from "@hugeicons/core-free-icons";
 import FlowerLogo from "~/components/common/flower";
 import { ThemeToggle } from "~/components/common/Theme-Toggle";
+
+import { NavUser } from "./NavUser";
 
 type IconSvgObject =
   | [string, { [key: string]: string | number }][]
@@ -63,11 +64,6 @@ const data: SidebarItem[] = [
     url: "/templates",
     icon: StoreAdd02Icon,
   },
-  {
-    label: "Settings",
-    url: "/settings",
-    icon: Settings02Icon,
-  },
 ];
 
 export function AppSidebar() {
@@ -100,6 +96,7 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
+        <NavUser />
         <ThemeToggle />
       </SidebarFooter>
     </Sidebar>

@@ -74,7 +74,11 @@ export function setAuthenticationTokenInCookie(ctx: TRPCContext, token: string) 
 }
 
 export function getAuthenticationTokenFromCookie(ctx: TRPCContext): string | undefined {
-  return ctx.getCookie(AUTHENTICATION_TOKEN_COOKIE_NAME);
+  return (
+    ctx.getCookie(AUTHENTICATION_TOKEN_COOKIE_NAME) ||
+    ctx.getCookie("anyform.session_token") ||
+    ctx.getCookie("__Secure-anyform.session_token")
+  );
 }
 
 export function clearAuthenticationTokenFromCookie(ctx: TRPCContext) {
