@@ -6,16 +6,11 @@ import {
   analyticsOutputSchema,
 } from "./model";
 import { form, formSubmission } from "@repo/database/schema";
-import { logger } from "@repo/logger";
 
 class AnalyticsService {
   public async asyncGetAnalytics(payload: GetAnalyticsInputType): Promise<AnalyticsOutput> {
     try {
       const { userId } = await getAnalyticsInput.parseAsync(payload);
-
-      logger.debug("Running analytics query for user", { userId });
-
-      // Using Drizzle's sql template correctly with table objects
       const analytics = await db.execute(sql`
         WITH 
         active_forms_def AS (
@@ -211,8 +206,6 @@ class AnalyticsService {
         ) AS dashboard_data
       `);
 
-      logger.debug("Analytics query raw result", { rows: analytics.rows });
-
       const result = analytics.rows[0]?.dashboard_data;
       if (!result) {
         return {
@@ -235,16 +228,11 @@ class AnalyticsService {
 
       const parsed = analyticsOutputSchema.safeParse(result);
       if (!parsed.success) {
-        logger.error("Analytics validation failed", {
-          errors: parsed.error.format(),
-          data: result,
-        });
         throw parsed.error;
       }
 
       return parsed.data;
     } catch (error) {
-      logger.error("Error in asyncGetAnalytics", error);
       throw error;
     }
   }

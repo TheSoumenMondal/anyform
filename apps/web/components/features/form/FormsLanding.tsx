@@ -16,28 +16,19 @@ import {
   EmptyTitle,
 } from "~/components/ui/empty";
 import { Skeleton } from "~/components/ui/skeleton";
-import { useSidebar } from "~/components/ui/sidebar";
 
-const getFormGridClassName = (isSidebarOpen: boolean) =>
-  cn(
-    "grid gap-4",
-    isSidebarOpen
-      ? "lg:grid-cols-2 xl:grid-cols-3"
-      : "sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3",
-  );
+const getFormGridClassName = () => cn("flex flex-col gap-3 w-full");
 
 export const FormsLanding = () => {
-  const { state: sidebarState, isMobile, openMobile } = useSidebar();
   const { forms, formsError, formsIsError, formsIsLoading } = useForms();
-  const isSidebarOpen = isMobile ? openMobile : sidebarState === "expanded";
-  const gridClassName = getFormGridClassName(isSidebarOpen);
+  const gridClassName = getFormGridClassName();
 
   return (
-    <main className="flex min-h-full flex-col gap-6 p-4 md:p-6">
+    <main className="flex min-h-full flex-col gap-6 p-2">
       {formsIsLoading ? (
         <div className={gridClassName}>
           {Array.from({ length: 12 }).map((_, index) => (
-            <Skeleton key={index} className="h-52 rounded-lg" />
+            <Skeleton key={index} className="h-24 rounded-xl" />
           ))}
         </div>
       ) : formsIsError ? (
@@ -51,7 +42,7 @@ export const FormsLanding = () => {
           </EmptyHeader>
         </Empty>
       ) : forms.length > 0 ? (
-        <div className={gridClassName}>
+        <div className={cn(gridClassName, "w-full")}>
           {forms.map((form) => (
             <FormCard key={form.id} form={form} />
           ))}

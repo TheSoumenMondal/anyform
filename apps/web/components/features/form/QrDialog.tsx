@@ -31,9 +31,10 @@ const getQrFileName = (formTitle: string) =>
 type QrDialogProps = {
   formId: string;
   formTitle: string;
+  trigger?: React.ReactElement;
 };
 
-const QrDialog = ({ formId, formTitle }: QrDialogProps) => {
+const QrDialog = ({ formId, formTitle, trigger }: QrDialogProps) => {
   const { resolvedTheme } = useTheme();
 
   const currentQrOptions = React.useMemo<SnapQROptions>(() => {
@@ -92,53 +93,48 @@ const QrDialog = ({ formId, formTitle }: QrDialogProps) => {
 
   React.useEffect(() => {
     let active = true;
-    let url = "";
-
     const generateQr = async () => {
       try {
-        const blob = await getRawData("svg");
-        if (active && blob) {
-          url = URL.createObjectURL(blob as Blob);
-          setImgSrc(url);
+        const data = await getRawData("svg");
+        if (active && data) {
+          const blob =
+            data instanceof Blob ? data : new Blob([data as BlobPart], { type: "image/svg+xml" });
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            if (active) setImgSrc(reader.result as string);
+          };
+          reader.readAsDataURL(blob);
         }
       } catch (error) {
-        toast.error("Error", {
-          description: error instanceof Error ? error.message : "Could not generate QR code.",
+        toast.error("Failed", {
+          description: error instanceof Error ? error.message : "Failed to generate QR code",
           action: (
             <Button
               className="ml-auto"
               size="sm"
               type="button"
-              variant="info"
+              variant="raised"
               onClick={() => toast.dismiss()}
             >
               Close
             </Button>
           ),
-          style: {
-            border: "1px solid var(--border)",
-            borderStyle: "dashed",
-          },
         });
       }
     };
 
     generateQr();
-
     return () => {
       active = false;
-      if (url) {
-        URL.revokeObjectURL(url);
-      }
     };
-  }, [getRawData]);
+  }, [getRawData, formUrl]);
 
   const handleCopyLink = async () => {
     try {
       await navigator.clipboard.writeText(formUrl);
       setIsCopied(true);
-      toast.success("QR link copied", {
-        description: "The link has been copied to your clipboard.",
+      toast.success("Link copied", {
+        description: "Form link copied to clipboard",
         action: (
           <Button
             className="ml-auto"
@@ -150,14 +146,23 @@ const QrDialog = ({ formId, formTitle }: QrDialogProps) => {
             Close
           </Button>
         ),
-        style: {
-          border: "1px solid var(--border)",
-          borderStyle: "dashed",
-        },
       });
-      window.setTimeout(() => setIsCopied(false), 1500);
-    } catch {
-      toast.error("Could not copy QR link");
+      setTimeout(() => setIsCopied(false), 2000);
+    } catch (err) {
+      toast.error("Failed to copy", {
+        description: err instanceof Error ? err.message : "Failed to copy link",
+        action: (
+          <Button
+            className="ml-auto"
+            size="sm"
+            type="button"
+            variant="raised"
+            onClick={() => toast.dismiss()}
+          >
+            Close
+          </Button>
+        ),
+      });
     }
   };
 
@@ -171,16 +176,19 @@ const QrDialog = ({ formId, formTitle }: QrDialogProps) => {
   return (
     <Dialog>
       <DialogTrigger
+        nativeButton={!trigger}
         render={
-          <Button
-            animation="none"
-            type="button"
-            variant="info"
-            size="icon-lg"
-            aria-label={`Open QR code for ${formTitle}`}
-          >
-            <HugeiconsIcon icon={QrCodeIcon} className="size-3.5" />
-          </Button>
+          trigger || (
+            <Button
+              size="default"
+              className="text-xs"
+              variant="warning"
+              aria-label={`QR Code for ${formTitle}`}
+            >
+              <HugeiconsIcon icon={QrCodeIcon} className="size-3.5" />
+              QR Code
+            </Button>
+          )
         }
       />
       <DialogPopup className="sm:max-w-md" containerClassName="gap-5 sm:max-w-md">

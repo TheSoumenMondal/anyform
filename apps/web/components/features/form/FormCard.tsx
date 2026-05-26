@@ -4,19 +4,32 @@ import Link from "next/link";
 import { format } from "date-fns";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
-  Calendar01Icon,
-  EditTableIcon,
-  LockKeyIcon,
-  UserLove01Icon,
+  Add,
+  Globe02Icon,
+  Key01Icon,
+  LockPasswordIcon,
+  Megaphone02Icon,
+  PencilIcon,
+  QrCodeIcon,
+  Trash2,
+  UserStatusIcon,
 } from "@hugeicons/core-free-icons";
 import { type RouterOutputs } from "@repo/trpc/client";
 
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "~/components/ui/card";
-import { BadgeAdditional } from "~/components/ui/badge-1";
 import QrDialog from "./QrDialog";
 import { EditFormSheet } from "./EditFormSheet";
 import { DeleteFormDialog } from "./DeleteFormDialog";
 import { Button } from "~/components/ui/button";
+
+import { MoreHorizontal } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "~/components/ui/dropdown-menu";
+import { useSidebar } from "~/components/ui/sidebar";
+import { useRouter } from "next/navigation";
 
 type UserForm = RouterOutputs["form"]["getFormsByUserId"][number];
 
@@ -30,61 +43,115 @@ const formatFormType = (formType: UserForm["formType"]) =>
   formType === "single_step" ? "Single step" : "Multi step";
 
 export const FormCard = ({ form }: FormCardProps) => {
-  return (
-    <Card className="h-full rounded-md border py-0">
-      <Link href={`/form/${form.slug}`} className="group flex flex-1 flex-col">
-        <CardHeader className="gap-3 p-5">
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0 space-y-2">
-              <CardTitle className="line-clamp-2 font-semibold leading-snug">
-                {form.title}
-              </CardTitle>
-              <p className="line-clamp-2 min-h-10 text-sm font-sans text-muted-foreground">
-                {form.description || "No description provided."}
-              </p>
-            </div>
-            <BadgeAdditional variant="outline" className="capitalize">
-              {form.formStatus}
-            </BadgeAdditional>
-          </div>
-        </CardHeader>
-        <CardContent className="flex flex-1 flex-col gap-4 p-5 pt-0">
-          <div className="flex flex-wrap gap-2">
-            <BadgeAdditional variant="secondary">{formatFormType(form.formType)}</BadgeAdditional>
-            <BadgeAdditional variant={form.isPublic ? "info" : "outline"}>
-              {form.isPublic ? "Public" : "Private"}
-            </BadgeAdditional>
-            {form.isProtected ? (
-              <BadgeAdditional variant="warning">
-                <HugeiconsIcon icon={LockKeyIcon} className="size-3" />
-                Protected
-              </BadgeAdditional>
-            ) : null}
-          </div>
+  const { isMobile } = useSidebar();
+  const router = useRouter();
+  const handleAddFormFields = () => {
+    router.push(`/form/${form.slug}`);
+  };
 
-          <div className="grid gap-2 text-sm text-muted-foreground">
-            <div className="flex items-center gap-2">
-              <HugeiconsIcon icon={UserLove01Icon} className="size-4 shrink-0" />
-              <span>{form.maxSubmissionLimit ?? "Unlimited"} submissions</span>
+  return (
+    <div className="w-full bg-accent flex flex-col rounded-xl overflow-hidden border">
+      <div className="w-full p-2 px-4 flex items-center justify-between">
+        <div>
+          <p className="text-2xl font-semibold font-instrumental-serif tracking-wide">
+            {form.title}
+          </p>
+          <p className="text-xs text-muted-foreground font-mono">{form.description}</p>
+        </div>
+        <div className="flex items-center gap-2">
+          {isMobile ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <MoreHorizontal />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="bg-card mr-10 p-1.5">
+                <EditFormSheet
+                  form={form}
+                  trigger={
+                    <DropdownMenuItem className="w-full" onSelect={(e) => e.preventDefault()}>
+                      <HugeiconsIcon icon={PencilIcon} className="size-3.5" />
+                      Edit form settings
+                    </DropdownMenuItem>
+                  }
+                />
+                <QrDialog
+                  formId={form.id}
+                  formTitle={form.title}
+                  trigger={
+                    <DropdownMenuItem className="w-full" onSelect={(e) => e.preventDefault()}>
+                      <HugeiconsIcon icon={QrCodeIcon} className="size-3.5" />
+                      QR Code
+                    </DropdownMenuItem>
+                  }
+                />
+                <DropdownMenuItem className="w-full" onSelect={handleAddFormFields}>
+                  <HugeiconsIcon icon={Add} className="size-3.5" />
+                  Add form fields
+                </DropdownMenuItem>
+                <DeleteFormDialog
+                  formId={form.id}
+                  formTitle={form.title}
+                  trigger={
+                    <DropdownMenuItem
+                      className="w-full"
+                      variant="destructive"
+                      onSelect={(e) => e.preventDefault()}
+                    >
+                      <HugeiconsIcon icon={Trash2} className="size-3.5" />
+                      Delete form
+                    </DropdownMenuItem>
+                  }
+                />
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <div className="flex items-center gap-0.5">
+              <DeleteFormDialog formId={form.id} formTitle={form.title} />
+              <EditFormSheet form={form} />
+              <QrDialog formId={form.id} formTitle={form.title} />
+              <Button variant="warning" onClick={handleAddFormFields}>
+                <HugeiconsIcon icon={Add} />
+                Add form fields
+              </Button>
             </div>
-            <div className="flex items-center gap-2">
-              <HugeiconsIcon icon={Calendar01Icon} className="size-4 shrink-0" />
-              <span>Expires {formatDate(form.expiry)}</span>
-            </div>
-          </div>
-        </CardContent>
-      </Link>
-      <CardFooter background className="mb-0! gap-2">
-        <Link href={`/form/${form.slug}`} className="ml-auto">
-          <Button size="lg" variant="info">
-            {" "}
-            <HugeiconsIcon icon={EditTableIcon} /> Add Fields
+          )}
+        </div>
+      </div>
+      <Link
+        href={`/form/${form.slug}`}
+        className="bg-card w-full p-4 rounded-lg border-t flex items-center justify-between"
+      >
+        <div className="flex gap-1">
+          <Button className="border border-dashed" variant={"outline"}>
+            {formatFormType(form.formType)}
           </Button>
-        </Link>
-        <DeleteFormDialog formId={form.id} formTitle={form.title} />
-        <EditFormSheet form={form} />
-        <QrDialog formId={form.id} formTitle={form.title} />
-      </CardFooter>
-    </Card>
+          <Button className="border border-dashed" variant={"outline"}>
+            {form.formStatus}
+          </Button>
+          <Button className="border border-dashed" variant={"outline"} size="icon">
+            {form.isPublic ? (
+              <HugeiconsIcon icon={Globe02Icon} className="text-sky-600" />
+            ) : (
+              <HugeiconsIcon icon={LockPasswordIcon} />
+            )}
+          </Button>
+          <Button className="border border-dashed" variant={"outline"}>
+            <HugeiconsIcon icon={UserStatusIcon} />
+            {form.maxSubmissionLimit}
+          </Button>
+          <Button className="border border-dashed" variant={"outline"} size="icon">
+            {form.isProtected ? (
+              <HugeiconsIcon icon={Key01Icon} />
+            ) : (
+              <HugeiconsIcon icon={Megaphone02Icon} />
+            )}
+          </Button>
+        </div>
+        <div className="hidden lg:flex flex-col">
+          <p className="text-xs text-muted-foreground">Created: {formatDate(form.createdAt)}</p>
+          <p className="text-xs text-muted-foreground">Expiring: {formatDate(form.expiry)}</p>
+        </div>
+      </Link>
+    </div>
   );
 };

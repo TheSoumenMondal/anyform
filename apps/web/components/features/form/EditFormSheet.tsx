@@ -119,9 +119,10 @@ type UserForm = RouterOutputs["form"]["getFormsByUserId"][number];
 
 type EditFormSheetProps = {
   form: UserForm;
+  trigger?: React.ReactElement;
 };
 
-export const EditFormSheet = ({ form: initialForm }: EditFormSheetProps) => {
+export const EditFormSheet = ({ form: initialForm, trigger }: EditFormSheetProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const { updateForm, updateFormIsPending } = useUpdateForm();
 
@@ -197,16 +198,18 @@ export const EditFormSheet = ({ form: initialForm }: EditFormSheetProps) => {
       }}
     >
       <SheetTrigger asChild>
-        <Button
-          size="lg"
-          animation="none"
-          type="button"
-          variant="info"
-          aria-label={`Edit ${initialForm.title}`}
-        >
-          <HugeiconsIcon icon={PencilIcon} className="size-3.5" />
-          Edit
-        </Button>
+        {trigger || (
+          <Button
+            size="default"
+            animation="none"
+            type="button"
+            variant="warning"
+            aria-label={`Edit ${initialForm.title}`}
+          >
+            <HugeiconsIcon icon={PencilIcon} className="size-3.5" />
+            Edit
+          </Button>
+        )}
       </SheetTrigger>
       <SheetContent side="right" className="sm:max-w-xl w-full flex flex-col p-0 gap-0">
         <SheetHeader className="px-6 py-4 border-b">

@@ -24,9 +24,10 @@ import Image from "next/image";
 type DeleteFormDialogProps = {
   formId: string;
   formTitle: string;
+  trigger?: React.ReactElement;
 };
 
-export const DeleteFormDialog = ({ formId, formTitle }: DeleteFormDialogProps) => {
+export const DeleteFormDialog = ({ formId, formTitle, trigger }: DeleteFormDialogProps) => {
   const [open, setOpen] = useState(false);
   const { deleteForm, deleteFormIsPending } = useDeleteForm();
 
@@ -52,16 +53,17 @@ export const DeleteFormDialog = ({ formId, formTitle }: DeleteFormDialogProps) =
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
-        <Button
-          animation="none"
-          type="button"
-          size="lg"
-          variant="destructive"
-          aria-label={`Delete ${formTitle}`}
-        >
-          <HugeiconsIcon icon={Trash2} className="size-3.5" />
-          Delete
-        </Button>
+        {trigger || (
+          <Button
+            animation="none"
+            type="button"
+            size="icon"
+            variant="destructive"
+            aria-label={`Delete ${formTitle}`}
+          >
+            <HugeiconsIcon icon={Trash2} className="size-3.5" />
+          </Button>
+        )}
       </AlertDialogTrigger>
 
       <AlertDialogContent className="sm:max-w-sm">

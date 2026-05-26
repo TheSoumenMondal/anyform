@@ -1,4 +1,4 @@
-import { FormBuilderEditor } from "~/components/features/form/builder/FormBuilderEditor";
+import { FormBuilderEditor } from "~/components/features/form/single-step-form-builder/FormBuilderEditor";
 
 type FormDetailsPageProps = {
   params: Promise<{
