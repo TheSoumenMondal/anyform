@@ -4,6 +4,8 @@ import {
   GetAnalyticsInputType,
   AnalyticsOutput,
   analyticsOutputSchema,
+  YearlyDailyAnalyticsOutput,
+  yearlyDailyAnalyticsOutputSchema,
 } from "./model";
 import { form, formSubmission } from "@repo/database/schema";
 
@@ -227,6 +229,69 @@ class AnalyticsService {
       }
 
       const parsed = analyticsOutputSchema.safeParse(result);
+      if (!parsed.success) {
+        throw parsed.error;
+      }
+
+      return parsed.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  public async asyncGetYearlyDailyAnalytics(
+    payload: GetAnalyticsInputType,
+  ): Promise<YearlyDailyAnalyticsOutput> {
+    try {
+      const { userId } = await getAnalyticsInput.parseAsync(payload);
+      const analytics = await db.execute(sql`
+        WITH 
+        yearly_daily_series AS (
+          SELECT day_start
+          FROM generate_series(
+            date_trunc('day', now() - interval '364 days'),
+            date_trunc('day', now()),
+            interval '1 day'
+          ) AS day_start
+        ),
+        active_forms_def AS (
+          SELECT id
+          FROM ${form}
+          WHERE form_status != 'deleted'
+            AND created_by = ${userId} 
+        ),
+        daily_submissions AS (
+          SELECT 
+            date_trunc('day', fs.submitted_at) AS day_start,
+            COUNT(*) AS submission_count
+          FROM ${formSubmission} fs
+          WHERE fs.status = 'submitted'
+            AND fs.submitted_at >= date_trunc('day', now() - interval '364 days')
+            AND fs.form_id IN (SELECT id FROM active_forms_def)
+          GROUP BY date_trunc('day', fs.submitted_at)
+        )
+        SELECT jsonb_build_object(
+          'daily_activity', (
+            SELECT COALESCE(jsonb_agg(
+              jsonb_build_object(
+                'date', to_char(ys.day_start, 'YYYY-MM-DD'),
+                'count', COALESCE(ds.submission_count, 0)
+              ) ORDER BY ys.day_start
+            ), '[]'::jsonb)
+            FROM yearly_daily_series ys
+            LEFT JOIN daily_submissions ds ON ys.day_start = ds.day_start
+          )
+        ) AS dashboard_data
+      `);
+
+      const result = analytics.rows[0]?.dashboard_data;
+      if (!result) {
+        return {
+          daily_activity: [],
+        };
+      }
+
+      const parsed = yearlyDailyAnalyticsOutputSchema.safeParse(result);
       if (!parsed.success) {
         throw parsed.error;
       }

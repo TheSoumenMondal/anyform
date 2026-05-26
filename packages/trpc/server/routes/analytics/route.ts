@@ -2,8 +2,7 @@ import { TRPCError } from "@trpc/server";
 import { zodUndefinedModel } from "../../schema";
 import { analyticsService } from "../../services";
 import { protectedProcedure, router } from "../../trpc";
-import { analyticsOutputSchema } from "./model";
-
+import { analyticsOutputSchema, yearlyDailyAnalyticsOutputSchema } from "./model";
 const analyticsTags = ["Analytics"];
 
 export const analyticsRouter = router({
@@ -28,6 +27,32 @@ export const analyticsRouter = router({
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: error instanceof Error ? error.message : "Failed to fetch analytics data",
+          cause: error,
+        });
+      }
+    }),
+  getYearlyDailyAnalyticsData: protectedProcedure
+    .meta({
+      openapi: {
+        method: "GET",
+        path: "/analytics/yearly-daily",
+        tags: analyticsTags,
+        protect: true,
+      },
+    })
+    .input(zodUndefinedModel)
+    .output(yearlyDailyAnalyticsOutputSchema)
+    .query(async ({ ctx }) => {
+      try {
+        const userId = ctx.user.id;
+        const analyticsData = await analyticsService.asyncGetYearlyDailyAnalytics({ userId });
+        return analyticsData;
+      } catch (error) {
+        console.error("TRPC Error in getYearlyDailyAnalyticsData:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message:
+            error instanceof Error ? error.message : "Failed to fetch yearly daily analytics data",
           cause: error,
         });
       }

@@ -44,3 +44,14 @@ export const analyticsOutputSchema = z.object({
 });
 
 export type AnalyticsOutput = z.infer<typeof analyticsOutputSchema>;
+
+const yearlyDailyActivityItemSchema = z.object({
+  date: z.string(),
+  count: z.coerce.number().int().nonnegative(),
+});
+
+export const yearlyDailyAnalyticsOutputSchema = z.object({
+  daily_activity: z.array(yearlyDailyActivityItemSchema),
+});
+
+export type YearlyDailyAnalyticsOutput = z.infer<typeof yearlyDailyAnalyticsOutputSchema>;
