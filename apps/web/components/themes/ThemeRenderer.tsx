@@ -8,6 +8,7 @@ import MovieTheme from "./movie/MovieTheme";
 import OsTheme from "./os/OsTheme";
 import StartupTheme from "./startup/StartupTheme";
 import TerminalTheme from "./terminal/TerminalTheme";
+import DefaultTheme from "./default/DefaultTheme";
 import { Skeleton } from "~/components/ui/skeleton";
 
 type ThemeRendererProps = {
@@ -52,8 +53,9 @@ export const ThemeRenderer = ({ slug }: ThemeRendererProps) => {
     case "terminal":
       return <TerminalTheme slug={slug} />;
     case "startup":
+      return <StartupTheme slug={slug} />;
     case "default":
     default:
-      return <StartupTheme slug={slug} />;
+      return <DefaultTheme slug={slug} />;
   }
 };

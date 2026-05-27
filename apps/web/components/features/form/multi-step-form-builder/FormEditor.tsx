@@ -306,13 +306,39 @@ export default function FormEditor({ form }: { form?: FormDetails }) {
           sortOrder: targetNode?.data.fields?.length ?? 0,
           stepNumber: stepNumber,
         })
-          .then(() => {
+          .then((created) => {
+            setNodes((currentNodes) =>
+              currentNodes.map((node) => {
+                if (!node.data.fields) return node;
+                return {
+                  ...node,
+                  data: {
+                    ...node.data,
+                    fields: node.data.fields.map((f) =>
+                      f.id === tempId ? { ...f, id: created.id } : f,
+                    ),
+                  },
+                };
+              }),
+            );
+            setSelectedFieldId((prev) => (prev === tempId ? created.id : prev));
             refetchFormFields();
           })
           .catch((err) => {
             console.error("Failed to create field", err);
-            // Rollback on failure (simplified)
-            refetchFormFields();
+            setNodes((currentNodes) =>
+              currentNodes.map((node) => {
+                if (!node.data.fields) return node;
+                return {
+                  ...node,
+                  data: {
+                    ...node.data,
+                    fields: node.data.fields.filter((f) => f.id !== tempId),
+                  },
+                };
+              }),
+            );
+            setSelectedFieldId((prev) => (prev === tempId ? null : prev));
           });
 
         return nds.map((node) => {
