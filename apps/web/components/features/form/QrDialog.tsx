@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Copy01Icon, Download01Icon, QrCodeIcon } from "@hugeicons/core-free-icons";
+import { Copy01Icon, Download01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import useSnapQR, { type SnapQROptions } from "snap-qr";
 import { toast } from "sonner";
@@ -179,22 +179,7 @@ const QrDialog = ({ formTitle, formSlug, trigger, open, onOpenChange }: QrDialog
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogTrigger
-        nativeButton={!trigger}
-        render={
-          trigger || (
-            <Button
-              size="default"
-              className="text-xs"
-              variant="warning"
-              aria-label={`QR Code for ${formTitle}`}
-            >
-              <HugeiconsIcon icon={QrCodeIcon} className="size-3.5" />
-              QR Code
-            </Button>
-          )
-        }
-      />
+      {trigger && <DialogTrigger nativeButton={false} render={trigger} />}
       <DialogPopup className="sm:max-w-md" containerClassName="gap-5 sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="font-instrumental-serif text-3xl font-bold">

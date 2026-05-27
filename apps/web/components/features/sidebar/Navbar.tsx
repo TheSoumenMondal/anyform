@@ -8,6 +8,7 @@ import {
   PanelRightCloseIcon,
   Upload01Icon,
   Archive03Icon,
+  Share05Icon,
 } from "@hugeicons/core-free-icons";
 import { useSidebar } from "~/components/ui/sidebar";
 import { Separator } from "~/components/ui/separator";
@@ -22,6 +23,7 @@ import {
 import { Button } from "~/components/ui/button";
 import { toast } from "sonner";
 import { CreateFormDialog } from "../form/CreateFormDialog";
+import QrDialog from "../form/QrDialog";
 import { usePublishForm } from "~/hooks/api/form/use-publish-form";
 import { useArchiveForm } from "~/hooks/api/form/use-archive-form";
 import { useFormBySlug } from "~/hooks/api/form/use-form-by-slug";
@@ -78,8 +80,11 @@ const Navbar = () => {
         </Breadcrumb>
       </div>
 
-      {isFormListRoute && <CreateFormDialog />}
-      {isFormDetailRoute && formSlug && <PublishButton slug={formSlug} />}
+      <div className="flex items-center gap-2">
+        {isFormListRoute && <CreateFormDialog />}
+        {isFormDetailRoute && formSlug && <ShareFormButton slug={formSlug} />}
+        {isFormDetailRoute && formSlug && <PublishButton slug={formSlug} />}
+      </div>
     </header>
   );
 };
@@ -220,6 +225,28 @@ const PublishButton = ({ slug }: PublishButtonProps) => {
       <HugeiconsIcon icon={Upload01Icon} className="size-3.5 shrink-0" />
       {publishFormIsPending ? "Publishing..." : "Publish"}
     </Button>
+  );
+};
+
+const ShareFormButton = ({ slug }: { slug: string }) => {
+  const { form } = useFormBySlug(slug);
+  const [qrOpen, setQrOpen] = React.useState(false);
+
+  if (!form) return null;
+
+  return (
+    <>
+      <Button variant="warning" onClick={() => setQrOpen(true)}>
+        <HugeiconsIcon icon={Share05Icon} className="size-4" />
+        Share
+      </Button>
+      <QrDialog
+        formTitle={form.title}
+        formSlug={form.slug}
+        open={qrOpen}
+        onOpenChange={setQrOpen}
+      />
+    </>
   );
 };
 
