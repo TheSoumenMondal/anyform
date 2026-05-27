@@ -4,7 +4,6 @@ import cors from "cors";
 
 import * as trpcExpress from "@trpc/server/adapters/express";
 import { generateOpenApiDocument, createOpenApiExpressMiddleware } from "trpc-to-openapi";
-import { apiReference } from "@scalar/express-api-reference";
 
 import { createContext } from "@repo/trpc/server/context.js";
 import { serverRouter } from "@repo/trpc/server/index.js";
@@ -46,7 +45,14 @@ app.get("/openapi.json", (req, res) => {
 });
 
 logger.debug(`docs: ${env.BASE_URL}/docs`);
-app.use("/docs", apiReference({ url: "/openapi.json" }));
+
+import("@scalar/express-api-reference")
+  .then(({ apiReference }) => {
+    app.use("/docs", apiReference({ url: "/openapi.json" }));
+  })
+  .catch((err) => {
+    logger.error("Failed to initialize API docs middleware", { err });
+  });
 
 app.use(
   "/api",

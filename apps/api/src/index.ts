@@ -1,3 +1,12 @@
+import crypto from "node:crypto";
+
+if (typeof globalThis.crypto === "undefined") {
+  Object.assign(globalThis, { crypto: crypto.webcrypto });
+}
+if (typeof global.crypto === "undefined") {
+  global.crypto = globalThis.crypto;
+}
+
 import http from "node:http";
 import { logger } from "@repo/logger";
 import { app as expressApplication } from "./server.js";
