@@ -148,24 +148,16 @@ export const FormCard = ({ form }: FormCardProps) => {
                   </DropdownMenuItem>
                 }
               />
-              <QrDialog
-                formTitle={form.title}
-                formSlug={form.slug}
-                open={qrOpen}
-                onOpenChange={setQrOpen}
-                trigger={
-                  <DropdownMenuItem
-                    className="w-full cursor-pointer"
-                    onSelect={(e) => {
-                      e.preventDefault();
-                      setQrOpen(true);
-                    }}
-                  >
-                    <HugeiconsIcon icon={QrCodeIcon} className="size-4" />
-                    Share QR
-                  </DropdownMenuItem>
-                }
-              />
+              <DropdownMenuItem
+                className="w-full cursor-pointer"
+                onSelect={(e) => {
+                  e.preventDefault();
+                  setQrOpen(true);
+                }}
+              >
+                <HugeiconsIcon icon={QrCodeIcon} className="size-4" />
+                Share QR
+              </DropdownMenuItem>
               {!form.forkedFromTemplateId && (
                 <>
                   <DropdownMenuSeparator />
@@ -212,6 +204,12 @@ export const FormCard = ({ form }: FormCardProps) => {
               />
             </DropdownMenuContent>
           </DropdownMenu>
+          <QrDialog
+            formTitle={form.title}
+            formSlug={form.slug}
+            open={qrOpen}
+            onOpenChange={setQrOpen}
+          />
         </div>
       </div>
       <Link
