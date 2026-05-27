@@ -104,7 +104,11 @@ export const FormCard = ({ form }: FormCardProps) => {
           <p className="text-2xl font-semibold font-instrumental-serif tracking-wide">
             {form.title}
           </p>
-          <p className="text-xs text-muted-foreground font-mono">{form.description}</p>
+          <p className="text-xs text-muted-foreground font-mono">
+            {form.description && form.description.length > 20
+              ? form.description.substring(0, 20) + "..."
+              : form.description}
+          </p>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="secondary" className="hidden sm:flex" onClick={handleAddFormFields}>
