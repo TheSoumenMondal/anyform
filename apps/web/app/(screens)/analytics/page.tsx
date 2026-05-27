@@ -13,9 +13,23 @@ const AnalyticsPage = () => {
 
   if (analyticsIsLoading || yearlyIsLoading || !analyticsData || !yearlyData) {
     return (
-      <div className="w-full h-full flex items-center justify-center min-h-[500px]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-        <span className="ml-3 text-muted-foreground font-medium">Loading analytics...</span>
+      <div className="w-full h-full flex flex-col p-4 md:p-6 lg:p-8 overflow-y-auto bg-background/50">
+        <div className="w-full mx-auto space-y-6 animate-pulse">
+          {/* Skeleton for Top Area Chart */}
+          <div className="w-full h-[350px] bg-muted/50 rounded-xl border border-dashed"></div>
+
+          {/* Skeleton for Bottom Table */}
+          <div className="bg-accent/30 border border-dashed rounded-xl flex flex-col shadow-sm overflow-hidden min-h-[400px]">
+            <div className="w-full h-[52px] bg-accent/50 border-b border-dashed"></div>
+            <div className="w-full flex-1 p-4 md:p-6 space-y-4 bg-card/50">
+              <div className="w-full h-12 bg-muted/40 rounded-lg"></div>
+              <div className="w-full h-12 bg-muted/40 rounded-lg"></div>
+              <div className="w-full h-12 bg-muted/40 rounded-lg"></div>
+              <div className="w-full h-12 bg-muted/40 rounded-lg"></div>
+              <div className="w-full h-12 bg-muted/40 rounded-lg"></div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
