@@ -32,9 +32,11 @@ type QrDialogProps = {
   formTitle: string;
   formSlug: string;
   trigger?: React.ReactElement;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 };
 
-const QrDialog = ({ formTitle, formSlug, trigger }: QrDialogProps) => {
+const QrDialog = ({ formTitle, formSlug, trigger, open, onOpenChange }: QrDialogProps) => {
   const { resolvedTheme } = useTheme();
 
   const currentQrOptions = React.useMemo<SnapQROptions>(() => {
@@ -129,7 +131,8 @@ const QrDialog = ({ formTitle, formSlug, trigger }: QrDialogProps) => {
     };
   }, [getRawData, formUrl]);
 
-  const handleCopyLink = async () => {
+  const handleCopyLink = async (e: React.MouseEvent) => {
+    e.stopPropagation();
     try {
       await navigator.clipboard.writeText(formUrl);
       setIsCopied(true);
@@ -166,7 +169,8 @@ const QrDialog = ({ formTitle, formSlug, trigger }: QrDialogProps) => {
     }
   };
 
-  const handleDownload = () => {
+  const handleDownload = (e: React.MouseEvent) => {
+    e.stopPropagation();
     onDownloadClick({
       name: getQrFileName(formTitle),
       extension: "png",
@@ -174,7 +178,7 @@ const QrDialog = ({ formTitle, formSlug, trigger }: QrDialogProps) => {
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger
         nativeButton={!trigger}
         render={

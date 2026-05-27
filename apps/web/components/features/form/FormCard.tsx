@@ -1,5 +1,6 @@
 "use client";
 
+import React, { useState } from "react";
 import Link from "next/link";
 import { format } from "date-fns";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -48,6 +49,7 @@ const formatFormType = (formType: UserForm["formType"]) =>
 
 export const FormCard = ({ form }: FormCardProps) => {
   const router = useRouter();
+  const [qrOpen, setQrOpen] = useState(false);
   const { shareAsTemplate, shareAsTemplateIsPending } = useShareAsTemplate();
   const { unshareTemplate, unshareTemplateIsPending } = useUnshareTemplate();
   const { myTemplates } = useMyTemplates();
@@ -149,10 +151,15 @@ export const FormCard = ({ form }: FormCardProps) => {
               <QrDialog
                 formTitle={form.title}
                 formSlug={form.slug}
+                open={qrOpen}
+                onOpenChange={setQrOpen}
                 trigger={
                   <DropdownMenuItem
                     className="w-full cursor-pointer"
-                    onSelect={(e) => e.preventDefault()}
+                    onSelect={(e) => {
+                      e.preventDefault();
+                      setQrOpen(true);
+                    }}
                   >
                     <HugeiconsIcon icon={QrCodeIcon} className="size-4" />
                     Share QR
