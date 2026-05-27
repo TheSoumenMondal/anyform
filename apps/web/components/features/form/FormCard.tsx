@@ -118,6 +118,17 @@ export const FormCard = ({ form }: FormCardProps) => {
             Add fields
           </Button>
 
+          {/* Share button — desktop only, opens QR dialog */}
+          <Button
+            variant="warning"
+            className="hidden sm:flex"
+            onClick={() => setQrOpen(true)}
+            aria-label={`Share ${form.title}`}
+          >
+            <HugeiconsIcon icon={Share05Icon} className="size-4" />
+            Share
+          </Button>
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -148,16 +159,19 @@ export const FormCard = ({ form }: FormCardProps) => {
                   </DropdownMenuItem>
                 }
               />
-              <DropdownMenuItem
-                className="w-full cursor-pointer"
-                onSelect={(e) => {
-                  e.preventDefault();
-                  setQrOpen(true);
-                }}
-              >
-                <HugeiconsIcon icon={QrCodeIcon} className="size-4" />
-                Share QR
-              </DropdownMenuItem>
+              {/* Share QR — mobile only (desktop has the Share button) */}
+              <div className="sm:hidden">
+                <DropdownMenuItem
+                  className="w-full cursor-pointer"
+                  onSelect={(e) => {
+                    e.preventDefault();
+                    setQrOpen(true);
+                  }}
+                >
+                  <HugeiconsIcon icon={QrCodeIcon} className="size-4" />
+                  Share QR
+                </DropdownMenuItem>
+              </div>
               {!form.forkedFromTemplateId && (
                 <>
                   <DropdownMenuSeparator />

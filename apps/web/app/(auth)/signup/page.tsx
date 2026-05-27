@@ -13,6 +13,7 @@ import { useForm } from "react-hook-form";
 import { LoadingButton } from "~/components/common/LoadingButton";
 import { useSignUp } from "~/hooks/api/auth/use-signup";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 type SignupFormValues = {
   name: string;
@@ -90,6 +91,7 @@ const getSignupErrorMessage = (error: unknown) => {
 };
 
 const SignupPage = () => {
+  const router = useRouter();
   const { formState, handleSubmit, register } = useForm<SignupFormValues>();
   const { createAccountWithEmailAndPasswordAsync } = useSignUp();
   const onSubmit = async (values: SignupFormValues) => {
@@ -120,6 +122,14 @@ const SignupPage = () => {
         password: values.password,
         name: values.name,
       });
+      toast.success("Account created!", {
+        description: "Your account has been created. Please log in to continue.",
+        style: {
+          border: "1px solid var(--border)",
+          borderStyle: "dashed",
+        },
+      });
+      router.push("/login");
     } catch (error) {
       toast.error("Account creation failed", {
         description: getSignupErrorMessage(error),
