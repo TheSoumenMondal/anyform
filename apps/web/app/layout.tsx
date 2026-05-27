@@ -13,6 +13,12 @@ const geistMono = localFont({
   variable: "--font-geist-mono",
 });
 
+// Cormorant Garamond
+const cormorantGaramond = localFont({
+  src: "./fonts/CormorantGaramond-Regular.woff",
+  variable: "--font-cormorant-garamond",
+});
+
 const instrumentalSerif = localFont({
   src: "./fonts/InstrumentSerifRegular.woff",
   variable: "--font-instrumental-serif",
@@ -32,7 +38,7 @@ export default function RootLayout({
     <html lang="en" className="dark" suppressHydrationWarning>
       <body
         suppressHydrationWarning
-        className={`${geistSans.variable} ${geistMono.variable} ${instrumentalSerif.variable}`}
+        className={`${geistSans.variable} ${geistMono.variable} ${instrumentalSerif.variable} ${cormorantGaramond.variable}`}
       >
         <GlobalProviders>{children}</GlobalProviders>
       </body>

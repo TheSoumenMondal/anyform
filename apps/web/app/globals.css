@@ -5,6 +5,7 @@
 
 @theme inline {
   --font-instrumental-serif: var(--font-instrumental-serif);
+  --font-cormorant-garamond: var(--font-cormorant-garamond);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -130,7 +131,7 @@
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.556 0 0);
   /* Charts - Dark */
-  --chart-1: oklch(0.7 0.16 40);  /* Matching Orange/Amber tone from light mode */
+  --chart-1: oklch(0.7 0.16 40); /* Matching Orange/Amber tone from light mode */
   --chart-2: oklch(0.75 0.14 80);
   --chart-3: oklch(0.8 0.08 150);
   --chart-4: oklch(0.75 0.1 190);
@@ -166,14 +167,12 @@
 }
 
 .scrollbar-hide {
-  -ms-overflow-style: none;  /* IE / Edge */
-  scrollbar-width: none;     /* Firefox */
+  -ms-overflow-style: none; /* IE / Edge */
+  scrollbar-width: none; /* Firefox */
 }
 .scrollbar-hide::-webkit-scrollbar {
-  display: none;             /* Chrome / Safari / Opera */
+  display: none; /* Chrome / Safari / Opera */
 }
-
-
 
 /* ── ReactFlow dark-mode overrides ───────────────────────────────────────── */
 
@@ -204,7 +203,7 @@
   --xy-handle-border-color-default: var(--background);
   --xy-edge-stroke-default: var(--muted-foreground);
   --xy-minimap-background-color-default: var(--background);
-  
+
   --xy-controls-button-background-color: var(--card);
   --xy-controls-button-background-color-default: var(--card);
   --xy-controls-button-border-color: var(--border);
@@ -224,7 +223,7 @@
   background-color: var(--accent) !important;
 }
 .react-flow__controls {
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
 }
 
 /* Hide the default ReactFlow edge label if any */
@@ -236,4 +235,3 @@
 .react-flow__edgeupdater {
   cursor: crosshair;
 }
-

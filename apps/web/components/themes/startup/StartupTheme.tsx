@@ -313,7 +313,7 @@ const StartupTheme = ({ slug }: StartupThemeProps) => {
     <div className="w-full min-h-screen relative overflow-hidden flex items-center justify-center p-4 sm:p-8 font-sans">
       <BackgroundImage />
       <StartupCard className="w-full max-w-2xl relative z-10">
-        <div className="max-h-[85vh] overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden p-6 sm:p-8">
+        <div className="max-h-[85vh] overflow-y-auto scrollbar-none [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden p-6 sm:p-8">
           <div className="flex flex-col gap-8">
             <div className="text-center space-y-2">
               <h1 className="text-[36px] sm:text-[42px] font-['Instrument_Serif'] font-normal text-gray-900 tracking-tight leading-tight">
@@ -327,9 +327,9 @@ const StartupTheme = ({ slug }: StartupThemeProps) => {
 
               {isMultiStep && maxSteps > 1 && (
                 <div className="mt-8 flex flex-col items-center gap-2.5">
-                  <div className="h-1 w-full max-w-[160px] bg-black/[0.06] rounded-full overflow-hidden">
+                  <div className="h-1 w-full max-w-40 bg-black/6 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-black rounded-full transition-[width] duration-[300ms] ease-[cubic-bezier(0.23,1,0.32,1)]"
+                      className="h-full bg-black rounded-full transition-[width] duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]"
                       style={{ width: `${progressPercentage}%` }}
                     />
                   </div>
@@ -370,7 +370,7 @@ const StartupTheme = ({ slug }: StartupThemeProps) => {
                       type="button"
                       variant="secondary"
                       onClick={prevStep}
-                      className="px-6 bg-white border-black/[0.1] hover:bg-gray-50 text-gray-700"
+                      className="px-6 bg-white border-black/10 hover:bg-gray-50 text-gray-700"
                     >
                       Back
                     </StartupButton>

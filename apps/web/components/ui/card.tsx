@@ -142,7 +142,7 @@ function CardFooter({ className, background = false, children, ...props }: TCard
       {background && (
         <div className="absolute -left-px -top-px z-10 opacity-50 pointer-events-none">
           <div className="relative">
-            <div className="bg-muted-foreground absolute -top-[5.5px] h-[11.8px] w-px rounded-full" />
+            <div className="bg-muted-foreground absolute top-[-5.5px] h-[11.8px] w-px rounded-full" />
             <div className="bg-muted-foreground absolute left-0 h-px w-[7.87px] rounded-full" />
           </div>
         </div>
@@ -151,7 +151,7 @@ function CardFooter({ className, background = false, children, ...props }: TCard
       {background && (
         <div className="absolute right-0 -top-px z-10 opacity-50 pointer-events-none">
           <div className="relative">
-            <div className="bg-muted-foreground absolute -top-[5.5px] h-[11.8px] w-px rounded-full" />
+            <div className="bg-muted-foreground absolute top-[-5.5px] h-[11.8px] w-px rounded-full" />
             <div className="bg-muted-foreground absolute -left-1.75 h-px w-[7.87px] rounded-full" />
           </div>
         </div>
